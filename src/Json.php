@@ -6,7 +6,7 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use stdClass;
 
-#[Attribute]
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Json
 {
     protected array $path;
@@ -15,13 +15,13 @@ class Json
 
     protected bool $omit_empty;
 
-    public function __construct(string|array $name = '', string $type = '', bool $omit_empty = false)
+    public function __construct(string|array $path = '', string $type = '', bool $omit_empty = false)
     {
-        if ($name !== '') {
-            if (is_string($name)) {
-                $name = [$name];
+        if ($path !== '') {
+            if (is_string($path)) {
+                $path = [$path];
             }
-            $this->path = $name;
+            $this->path = $path;
         }
 
         if ($type !== '') {
@@ -31,7 +31,11 @@ class Json
         $this->omit_empty = $omit_empty;
     }
 
-    public function forProperty(ReflectionProperty $prop)
+    /**
+     * Receive the property this attribute was set on. If the attribute was created without a name, we grab
+     * the property's name instead.
+     */
+    public function forProperty(ReflectionProperty $prop) : Json
     {
         if (isset($this->path)) {
             return $this;
@@ -54,6 +58,10 @@ class Json
         }
 
         if ($type === null) {
+            if (isset($this->type)) {
+                $t = $this->type;
+                return $t::fromJsonArray($data);
+            }
             return $data;
         }
 
@@ -120,8 +128,8 @@ class Json
             if ($i === $max) {
                 if (is_array($value)) {
                     $d->$pathBit = [];
-                    foreach ($value as $val) {
-                        $d->$pathBit[] = $this->jsonValue($val);
+                    foreach ($value as $k => $val) {
+                        $d->$pathBit[$k] = $this->jsonValue($val);
                     }
                 } else {
                     $d->$pathBit = $this->jsonValue($value);

@@ -19,6 +19,9 @@ class Category
     #[Json('next_schedule')]
     protected Schedule $schedule;
 
+    #[Json('untyped_schedule', type: Schedule::class, omit_empty: true)]
+    public $untypedSchedule;
+
     #[Json('upcomming_schedules', type: Schedule::class)]
     protected array $schedules;
 
@@ -68,5 +71,42 @@ class Schedule extends AbstractSchedule
     {
         $this->start = $start;
         $this->end = $end;
+    }
+}
+
+class Privateer
+{
+    use JsonSerialize;
+
+    #[Json]
+    private $name = "Jenna";
+}
+
+class DTO
+{
+    use JsonSerialize;
+
+    #[Json]
+    public readonly int $value;
+
+    public function __construct()
+    {
+        $this->value = 6;
+    }
+}
+
+class Weekend
+{
+    use JsonSerialize;
+
+    #[Json(type: Schedule::class)]
+    public array $weekend;
+
+    public function __construct()
+    {
+        $this->weekend = [
+            'sat' => new Schedule(1, 2),
+            'sun' => new Schedule(3, 4),
+        ];
     }
 }
