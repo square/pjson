@@ -1,8 +1,13 @@
 <?php declare(strict_types=1);
-require_once __DIR__.'/definitions.php';
+namespace Squareup\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
-
+use Squareup\Pjson\Tests\Definitions\BigCat;
+use Squareup\Pjson\Tests\Definitions\Category;
+use Squareup\Pjson\Tests\Definitions\DTO;
+use Squareup\Pjson\Tests\Definitions\Privateer;
+use Squareup\Pjson\Tests\Definitions\Schedule;
+use Squareup\Pjson\Tests\Definitions\Weekend;
 
 final class SerializationTest extends TestCase
 {
@@ -134,4 +139,3 @@ final class SerializationTest extends TestCase
         }')), $w->toJson());
     }
 }
-

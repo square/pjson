@@ -1,0 +1,29 @@
+version: "1.0"
+ci:
+  name: "pjson"
+  type: "library"
+  jobs:
+
+  - name: tests-8.0
+    type: test
+    containers:
+    - image: php
+      tag: "8.0"
+    tasks:
+    - name: php-lint
+      container: php
+      sh: |
+        composer install --no-interaction
+        make
+
+  - name: tests-8.1
+    type: test
+    containers:
+    - image: php
+      tag: "8.1"
+    tasks:
+    - name: php-lint
+      container: php
+      sh: |
+        composer install --no-interaction
+        make
