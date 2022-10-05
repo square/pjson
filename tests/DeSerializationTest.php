@@ -5,7 +5,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Squareup\Pjson\Tests\Definitions\BigCat;
 use Squareup\Pjson\Tests\Definitions\Category;
-use Squareup\Pjson\Tests\Definitions\DTO;
 use Squareup\Pjson\Tests\Definitions\Schedule;
 use Squareup\Pjson\Tests\Definitions\Privateer;
 use Squareup\Pjson\Tests\Definitions\Weekend;
@@ -34,6 +33,7 @@ final class DeSerializationTest extends TestCase
             '@class' => get_class($value),
         ];
         foreach ($rc->getProperties() as $prop) {
+            $prop->setAccessible(true);
             $v = $prop->isInitialized($value) ? $prop->getValue($value) : null;
             $n = $prop->getName();
 
@@ -42,6 +42,7 @@ final class DeSerializationTest extends TestCase
 
         return $data;
     }
+
     public function testDeserializesSimpleClass()
     {
         $c = Category::fromJsonString('{"identifier":"myid","category_name":"Clothes","data":{"name":null}}');
@@ -264,17 +265,6 @@ final class DeSerializationTest extends TestCase
             '@class' => Privateer::class,
             "name" => "Jenna",
         ], $this->export($p));
-    }
-
-    public function testReadOnly()
-    {
-        $d = DTO::fromJsonString('{
-            "value": 6
-        }');
-        $this->assertEquals([
-            '@class' => DTO::class,
-            "value" => 6,
-        ], $this->export($d));
     }
 
     public function testHashMaps()

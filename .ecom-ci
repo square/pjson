@@ -14,7 +14,7 @@ ci:
       container: php
       sh: |
         composer2 install --no-interaction
-        make
+        make ci-php80
 
   - name: tests-8.1
     type: test
@@ -26,4 +26,4 @@ ci:
       container: php
       sh: |
         composer2 install --no-interaction
-        make
+        make ci-php81

@@ -114,14 +114,6 @@ final class SerializationTest extends TestCase
         }')), $p->toJson());
     }
 
-    public function testReadOnly()
-    {
-        $d = new DTO;
-        $this->assertEquals(json_encode(json_decode('{
-            "value": 6
-        }')), $d->toJson());
-    }
-
     public function testHashMaps()
     {
         $w = new Weekend;

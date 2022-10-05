@@ -1,0 +1,4 @@
+parameters:
+	excludePaths:
+		- tests/Definitions/*
+		- tests/php81/*
