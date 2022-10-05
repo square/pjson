@@ -13,7 +13,7 @@ ci:
     - name: php-lint
       container: php
       sh: |
-        composer install --no-interaction
+        composer2 install --no-interaction
         make
 
   - name: tests-8.1
@@ -25,5 +25,5 @@ ci:
     - name: php-lint
       container: php
       sh: |
-        composer install --no-interaction
+        composer2 install --no-interaction
         make
