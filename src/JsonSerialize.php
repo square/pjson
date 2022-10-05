@@ -13,7 +13,7 @@ trait JsonSerialize
         return json_encode($this->toJsonData());
     }
 
-    public function toJsonData()
+    public function toJsonData() : stdClass
     {
         $r = RClass::make($this);
         $props = $r->getProperties();
@@ -32,10 +32,31 @@ trait JsonSerialize
         return $d;
     }
 
+    public static function toJsonListData(array $data) : array
+    {
+        return array_map(fn ($d) => $d->toJsonData(), $data);
+    }
+
+    public static function toJsonList(array $data) : string
+    {
+        return json_encode(static::toJsonListData($data));
+    }
+
     public static function fromJsonString(string $json) : static
     {
         $jd = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
         return self::fromJsonArray($jd);
+    }
+
+    public static function listFromJsonString(string $json) : array
+    {
+        $jd = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
+        return static::listFromJsonArray($jd);
+    }
+
+    public static function listFromJsonArray(array $json) : array
+    {
+        return array_map(fn ($d) => static::fromJsonArray($d), $json);
     }
 
     public static function fromJsonArray(array $jd) : static

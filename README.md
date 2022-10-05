@@ -318,3 +318,34 @@ $jsonItem = '{"type": "item", "id": "123", "name": "Sandals"}';
 $c = CatalogObject::fromJsonString($jsonItem);
 $this->assertEquals(CatalogItem::class, get_class($c));
 ```
+
+### Lists
+
+If you're dealing with a list of things to deserialize, you can call `MyClass::listFromJsonString($json)` or `MyClass::listFromJsonArray($array)`. For example:
+
+```php
+Schedule::listFromJsonString('[
+    {
+        "schedule_start": 1,
+        "schedule_end": 2
+    },
+    {
+        "schedule_start": 11,
+        "schedule_end": 22
+    },
+    {
+        "schedule_start": 111,
+        "schedule_end": 222
+    }
+]');
+```
+
+yields the same as
+
+```php
+[
+    new Schedule(1, 2),
+    new Schedule(11, 22),
+    new Schedule(111, 222),
+];
+```

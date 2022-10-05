@@ -152,4 +152,29 @@ final class SerializationTest extends TestCase
         $this->assertEquals(CatalogItem::class, get_class($c));
         $this->assertEquals('{"name":"Sandals","id":"123","type":"item"}', $c->toJson());
     }
+
+    public function testList()
+    {
+        $l = [
+            new Schedule(1, 2),
+            new Schedule(11, 22),
+            new Schedule(111, 222),
+        ];
+
+        $jl = Schedule::toJsonList($l);
+        $this->assertEquals(json_encode(json_decode('[
+            {
+                "schedule_start": 1,
+                "schedule_end": 2
+            },
+            {
+                "schedule_start": 11,
+                "schedule_end": 22
+            },
+            {
+                "schedule_start": 111,
+                "schedule_end": 222
+            }
+        ]')), $jl);
+    }
 }
