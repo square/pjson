@@ -11,7 +11,11 @@
          stopOnFailure="false"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
   <testsuites>
-    <testsuite name="unit">
+    <testsuite name="php80">
+      <directory suffix="Test.php">tests</directory>
+      <exclude >tests/php81</exclude>
+    </testsuite>
+    <testsuite name="php81">
       <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
