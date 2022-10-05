@@ -318,3 +318,56 @@ $jsonItem = '{"type": "item", "id": "123", "name": "Sandals"}';
 $c = CatalogObject::fromJsonString($jsonItem);
 $this->assertEquals(CatalogItem::class, get_class($c));
 ```
+
+### Lists
+
+If you're dealing with a list of things to deserialize, you can call `MyClass::listFromJsonString($json)` or `MyClass::listFromJsonArray($array)`. For example:
+
+```php
+Schedule::listFromJsonString('[
+    {
+        "schedule_start": 1,
+        "schedule_end": 2
+    },
+    {
+        "schedule_start": 11,
+        "schedule_end": 22
+    },
+    {
+        "schedule_start": 111,
+        "schedule_end": 222
+    }
+]');
+```
+
+yields the same as
+
+```php
+[
+    new Schedule(1, 2),
+    new Schedule(11, 22),
+    new Schedule(111, 222),
+];
+```
+
+### Initial path
+
+Somteimes the JSON you care about will be nested under a property but you don't want / need to model the outer layer. For this you can pass a `$path` to the deserializing methods:
+
+```php
+Schedule::fromJsonString('{
+    "data": {
+        "schedule_start": 1,
+        "schedule_end": 2
+    }
+}', path: 'data');
+
+Schedule::fromJsonString('{
+    "data": {
+        "main": {
+            "schedule_start": 1,
+            "schedule_end": 2
+        }
+    }
+}', path: ['data', 'main']);
+```
