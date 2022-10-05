@@ -1,7 +1,14 @@
 <?php declare(strict_types=1);
-require_once __DIR__.'/definitions.php';
+namespace Squareup\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use Squareup\Pjson\Tests\Definitions\BigCat;
+use Squareup\Pjson\Tests\Definitions\Category;
+use Squareup\Pjson\Tests\Definitions\DTO;
+use Squareup\Pjson\Tests\Definitions\Schedule;
+use Squareup\Pjson\Tests\Definitions\Privateer;
+use Squareup\Pjson\Tests\Definitions\Weekend;
 
 final class DeSerializationTest extends TestCase
 {
@@ -39,7 +46,7 @@ final class DeSerializationTest extends TestCase
     {
         $c = Category::fromJsonString('{"identifier":"myid","category_name":"Clothes","data":{"name":null}}');
         $this->assertEquals([
-            "@class" => "Category",
+            '@class' => Category::class,
             "id" => "myid",
             "name" => "Clothes",
             "data_name" => null,
@@ -58,7 +65,7 @@ final class DeSerializationTest extends TestCase
         $bc = BigCat::fromJsonString('{"identifier":"myid","category_name":"Clothes"}');
         $e = $this->export($bc);
         $this->assertEquals([
-            "@class" => "BigCat",
+            '@class' => BigCat::class,
             "data_name" => null,
             "id" => "myid",
             "name" => "Clothes",
@@ -74,7 +81,7 @@ final class DeSerializationTest extends TestCase
     {
         $s = Schedule::fromJsonString('{"schedule_start":1,"schedule_end":10}');
         $this->assertEquals([
-            "@class" => "Schedule",
+            '@class' => Schedule::class,
             "start" => 1,
             "end" => 10,
         ], $this->export($s));
@@ -94,12 +101,12 @@ final class DeSerializationTest extends TestCase
             }
         }');
         $this->assertEquals([
-            "@class" => "Category",
+            '@class' => Category::class,
             "id" => "myid",
             "name" => "Clothes",
             "data_name" => null,
             "schedule" =>  [
-              "@class" => "Schedule",
+              '@class' => Schedule::class,
               "start" => 1,
               "end" => 20,
             ],
@@ -134,23 +141,23 @@ final class DeSerializationTest extends TestCase
             ]
         }');
         $this->assertEquals([
-            "@class" => "Category",
+            '@class' => Category::class,
             "id" => "myid",
             "name" => "Clothes",
             "data_name" => null,
             "schedule" => [
-              "@class" => "Schedule",
+              '@class' => Schedule::class,
               "start" => 1,
               "end" => 20,
             ],
             "schedules" => [
               0 => [
-                "@class" => "Schedule",
+                '@class' => Schedule::class,
                 "start" => 1,
                 "end" => 20,
               ],
               1 => [
-                "@class" => "Schedule",
+                '@class' => Schedule::class,
                 "start" => 30,
                 "end" => 40,
               ],
@@ -176,7 +183,7 @@ final class DeSerializationTest extends TestCase
             ]
         }');
         $this->assertEquals([
-            "@class" => "Category",
+            '@class' => Category::class,
             "id" => "myid",
             "name" => "Clothes",
             "data_name" => null,
@@ -204,7 +211,7 @@ final class DeSerializationTest extends TestCase
         }');
 
         $this->assertEquals([
-            "@class" => "Category",
+            '@class' => Category::class,
             "id" => "myid",
             "name" => "Clothes",
             "data_name" => null,
@@ -232,7 +239,7 @@ final class DeSerializationTest extends TestCase
         }');
 
         $this->assertEquals([
-            "@class" => "Category",
+            '@class' => Category::class,
             "id" => "myid",
             "name" => "Clothes",
             "data_name" => null,
@@ -241,7 +248,7 @@ final class DeSerializationTest extends TestCase
             "counts" => [],
             "unnamed" => "bob",
             "untypedSchedule" => [
-                "@class" => "Schedule",
+                '@class' => Schedule::class,
                 "start" => 10,
                 "end" => 90,
             ],
@@ -254,7 +261,7 @@ final class DeSerializationTest extends TestCase
             "name": "Jenna"
         }');
         $this->assertEquals([
-            "@class" => "Privateer",
+            '@class' => Privateer::class,
             "name" => "Jenna",
         ], $this->export($p));
     }
@@ -265,7 +272,7 @@ final class DeSerializationTest extends TestCase
             "value": 6
         }');
         $this->assertEquals([
-            "@class" => "DTO",
+            '@class' => DTO::class,
             "value" => 6,
         ], $this->export($d));
     }
@@ -285,15 +292,15 @@ final class DeSerializationTest extends TestCase
             }
         }');
         $this->assertEquals([
-            "@class" => "Weekend",
+            '@class' => Weekend::class,
             "weekend" => [
               "sat" => [
-                "@class" => "Schedule",
+                '@class' => Schedule::class,
                 "start" => 1,
                 "end" => 2,
               ],
               "sun" => [
-                "@class" => "Schedule",
+                '@class' => Schedule::class,
                 "start" => 3,
                 "end" => 4,
               ],
