@@ -100,5 +100,38 @@ final class SerializationTest extends TestCase
             "unnamed": "bob"
         }')), $c->toJson());
     }
+
+    public function testPrivateProps()
+    {
+        $p = new Privateer;
+        $this->assertEquals(json_encode(json_decode('{
+            "name": "Jenna"
+        }')), $p->toJson());
+    }
+
+    public function testReadOnly()
+    {
+        $d = new DTO;
+        $this->assertEquals(json_encode(json_decode('{
+            "value": 6
+        }')), $d->toJson());
+    }
+
+    public function testHashMaps()
+    {
+        $w = new Weekend;
+        $this->assertEquals(json_encode(json_decode('{
+            "weekend": {
+                "sat": {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                "sun": {
+                    "schedule_start": 3,
+                    "schedule_end": 4
+                }
+            }
+        }')), $w->toJson());
+    }
 }
 

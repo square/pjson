@@ -17,8 +17,8 @@ final class DeSerializationTest extends TestCase
 
         if (is_array($value)) {
             $r = [];
-            foreach ($value as $v) {
-                $r[] = $this->export($v);
+            foreach ($value as $k => $v) {
+                $r[$k] = $this->export($v);
             }
             return $r;
         }
@@ -47,6 +47,7 @@ final class DeSerializationTest extends TestCase
             "schedules" => null,
             "counts" => [],
             "unnamed" => null,
+            "untypedSchedule" => null,
           ], $this->export($c));
     }
 
@@ -65,6 +66,7 @@ final class DeSerializationTest extends TestCase
             "schedules" => null,
             "counts" => [],
             "unnamed" => null,
+            "untypedSchedule" => null,
           ], $this->export($bc));
     }
 
@@ -104,6 +106,7 @@ final class DeSerializationTest extends TestCase
             "schedules" => null,
             "counts" => [],
             "unnamed" => null,
+            "untypedSchedule" => null,
         ], $this->export($c));
     }
 
@@ -154,6 +157,7 @@ final class DeSerializationTest extends TestCase
             ],
             "counts" => [],
             "unnamed" => null,
+            "untypedSchedule" => null,
         ], $this->export($c));
     }
 
@@ -184,6 +188,7 @@ final class DeSerializationTest extends TestCase
               2 => 678,
             ],
             "unnamed" => null,
+            "untypedSchedule" => null,
           ], $this->export($c));
     }
 
@@ -207,6 +212,92 @@ final class DeSerializationTest extends TestCase
             "schedules" => null,
             "counts" => [],
             "unnamed" => "bob",
+            "untypedSchedule" => null,
           ], $this->export($c));
+    }
+
+    public function testSerializesWithUntypedProp()
+    {
+        $c = Category::fromJsonString('{
+            "identifier": "myid",
+            "category_name": "Clothes",
+            "data": {
+                "name": null
+            },
+            "unnamed": "bob",
+            "untyped_schedule": {
+                "schedule_start": 10,
+                "schedule_end": 90
+            }
+        }');
+
+        $this->assertEquals([
+            "@class" => "Category",
+            "id" => "myid",
+            "name" => "Clothes",
+            "data_name" => null,
+            "schedule" => null,
+            "schedules" => null,
+            "counts" => [],
+            "unnamed" => "bob",
+            "untypedSchedule" => [
+                "@class" => "Schedule",
+                "start" => 10,
+                "end" => 90,
+            ],
+          ], $this->export($c));
+    }
+
+    public function testPrivateProps()
+    {
+        $p = Privateer::fromJsonString('{
+            "name": "Jenna"
+        }');
+        $this->assertEquals([
+            "@class" => "Privateer",
+            "name" => "Jenna",
+        ], $this->export($p));
+    }
+
+    public function testReadOnly()
+    {
+        $d = DTO::fromJsonString('{
+            "value": 6
+        }');
+        $this->assertEquals([
+            "@class" => "DTO",
+            "value" => 6,
+        ], $this->export($d));
+    }
+
+    public function testHashMaps()
+    {
+        $w = Weekend::fromJsonString('{
+            "weekend": {
+                "sat": {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                "sun": {
+                    "schedule_start": 3,
+                    "schedule_end": 4
+                }
+            }
+        }');
+        $this->assertEquals([
+            "@class" => "Weekend",
+            "weekend" => [
+              "sat" => [
+                "@class" => "Schedule",
+                "start" => 1,
+                "end" => 2,
+              ],
+              "sun" => [
+                "@class" => "Schedule",
+                "start" => 3,
+                "end" => 4,
+              ],
+            ],
+        ], $this->export($w));
     }
 }
