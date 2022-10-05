@@ -245,3 +245,76 @@ Week^ {#353
   ]
 }
 ```
+
+### Polymorphic deserialization
+
+Say you have 2 classes that extend a base class. You might receive those as part of a collection and don't know ahead of time if you'll be dealing with
+one or the other. For example:
+
+```php
+abstract class CatalogObject
+{
+    use JsonSerialize;
+
+    #[Json]
+    protected $id;
+
+    #[Json]
+    protected string $type;
+}
+
+class CatalogCategory extends CatalogObject
+{
+    use JsonSerialize;
+
+    #[Json('parent_category_id')]
+    protected string $parentCategoryId;
+}
+
+class CatalogItem extends CatalogObject
+{
+    use JsonSerialize;
+
+    #[Json]
+    protected string $name;
+}
+```
+
+You can implement the `fromJsonArray(array $array) : static` on `CatalogObject` to discriminate based on the received data and return the correct serialization:
+
+```php
+abstract class CatalogObject
+{
+    use JsonSerialize;
+
+    #[Json]
+    protected $id;
+
+    #[Json]
+    protected string $type;
+
+    public static function fromJsonArray(array $jd): static
+    {
+        $t = $jd['type'];
+
+        return match ($t) {
+            'category' => CatalogCategory::fromJsonArray($jd),
+            'item' => CatalogItem::fromJsonArray($jd),
+        };
+    }
+}
+```
+**WARNING:** Make sure that each of the subclasses directly `use JsonSerialize`. Otherwise when they call `::fromJsonArray`, they would call the parent on `CatalogObject`
+leading to infinite recursion.
+
+With this in place, we can do:
+
+```php
+$jsonCat = '{"type": "category", "id": "123", "parent_category_id": "456"}';
+$c = CatalogObject::fromJsonString($jsonCat);
+$this->assertEquals(CatalogCategory::class, get_class($c));
+
+$jsonItem = '{"type": "item", "id": "123", "name": "Sandals"}';
+$c = CatalogObject::fromJsonString($jsonItem);
+$this->assertEquals(CatalogItem::class, get_class($c));
+```

@@ -3,10 +3,13 @@ namespace Squareup\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Squareup\Pjson\Tests\Definitions\BigCat;
+use Squareup\Pjson\Tests\Definitions\CatalogCategory;
+use Squareup\Pjson\Tests\Definitions\CatalogItem;
+use Squareup\Pjson\Tests\Definitions\CatalogObject;
 use Squareup\Pjson\Tests\Definitions\Category;
-use Squareup\Pjson\Tests\Definitions\DTO;
 use Squareup\Pjson\Tests\Definitions\Privateer;
 use Squareup\Pjson\Tests\Definitions\Schedule;
+use Squareup\Pjson\Tests\Definitions\Traitor;
 use Squareup\Pjson\Tests\Definitions\Weekend;
 
 final class SerializationTest extends TestCase
@@ -129,5 +132,24 @@ final class SerializationTest extends TestCase
                 }
             }
         }')), $w->toJson());
+    }
+
+    public function testTraitProps()
+    {
+        $t = new Traitor;
+        $this->assertEquals(json_encode(json_decode('{"secretly_working_for": "MI6"}')), $t->toJson());
+    }
+
+    public function testPolymorphicClass()
+    {
+        $jsonCat = '{"type": "category", "id": "123", "parent_category_id": "456"}';
+        $c = CatalogObject::fromJsonString($jsonCat);
+        $this->assertEquals(CatalogCategory::class, get_class($c));
+        $this->assertEquals('{"parent_category_id":"456","id":"123","type":"category"}', $c->toJson());
+
+        $jsonItem = '{"type": "item", "id": "123", "name": "Sandals"}';
+        $c = CatalogObject::fromJsonString($jsonItem);
+        $this->assertEquals(CatalogItem::class, get_class($c));
+        $this->assertEquals('{"name":"Sandals","id":"123","type":"item"}', $c->toJson());
     }
 }
