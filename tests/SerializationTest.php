@@ -7,7 +7,6 @@ use Squareup\Pjson\Tests\Definitions\CatalogCategory;
 use Squareup\Pjson\Tests\Definitions\CatalogItem;
 use Squareup\Pjson\Tests\Definitions\CatalogObject;
 use Squareup\Pjson\Tests\Definitions\Category;
-use Squareup\Pjson\Tests\Definitions\DTO;
 use Squareup\Pjson\Tests\Definitions\Privateer;
 use Squareup\Pjson\Tests\Definitions\Schedule;
 use Squareup\Pjson\Tests\Definitions\Traitor;

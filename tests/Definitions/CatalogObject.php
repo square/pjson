@@ -16,15 +16,11 @@ abstract class CatalogObject
 
     public static function fromJsonArray(array $jd): static
     {
-        if (static::class === self::class) {
-            $t = $jd['type'];
+        $t = $jd['type'];
 
-            return match ($t) {
-                'category' => CatalogCategory::fromJsonArray($jd),
-                'item' => CatalogItem::fromJsonArray($jd),
-            };
-        }
-
-        return JsonSerialize::fromJsonArray($jd);
+        return match ($t) {
+            'category' => CatalogCategory::fromJsonArray($jd),
+            'item' => CatalogItem::fromJsonArray($jd),
+        };
     }
 }
