@@ -349,3 +349,25 @@ yields the same as
     new Schedule(111, 222),
 ];
 ```
+
+### Initial path
+
+Somteimes the JSON you care about will be nested under a property but you don't want / need to model the outer layer. For this you can pass a `$path` to the deserializing methods:
+
+```php
+Schedule::fromJsonString('{
+    "data": {
+        "schedule_start": 1,
+        "schedule_end": 2
+    }
+}', path: 'data');
+
+Schedule::fromJsonString('{
+    "data": {
+        "main": {
+            "schedule_start": 1,
+            "schedule_end": 2
+        }
+    }
+}', path: ['data', 'main']);
+```

@@ -42,25 +42,38 @@ trait JsonSerialize
         return json_encode(static::toJsonListData($data));
     }
 
-    public static function fromJsonString(string $json) : static
+    public static function fromJsonString(string $json, array|string $path = []) : static
     {
         $jd = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
-        return self::fromJsonArray($jd);
+        return self::fromJsonArray($jd, $path);
     }
 
-    public static function listFromJsonString(string $json) : array
+    public static function listFromJsonString(string $json, array|string $path = []) : array
     {
         $jd = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
-        return static::listFromJsonArray($jd);
+        return static::listFromJsonArray($jd, $path);
     }
 
-    public static function listFromJsonArray(array $json) : array
+    public static function listFromJsonArray(array $json, array|string $path = []) : array
     {
+        if (is_string($path)) {
+            $path = [$path];
+        }
+        foreach ($path as $pathBit) {
+            $json = $json[$pathBit];
+        }
         return array_map(fn ($d) => static::fromJsonArray($d), $json);
     }
 
-    public static function fromJsonArray(array $jd) : static
+    public static function fromJsonArray(array $jd, array|string $path = []) : static
     {
+        if (is_string($path)) {
+            $path = [$path];
+        }
+        foreach ($path as $pathBit) {
+            $jd = $jd[$pathBit];
+        }
+
         $r = RClass::make(static::class);
         $props = $r->getProperties();
         $return = $r->source()->newInstanceWithoutConstructor();

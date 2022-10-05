@@ -369,4 +369,67 @@ final class DeSerializationTest extends TestCase
             ]
         ], $this->export($deser));
     }
+
+    public function testPaths()
+    {
+        $deser = Schedule::fromJsonString('{
+            "data": {
+                "schedule_start": 1,
+                "schedule_end": 2
+            }
+        }', path: 'data');
+        $this->assertEquals([
+            "@class" => Schedule::class,
+            "start" => 1,
+            "end" => 2,
+        ], $this->export($deser));
+
+        $deser = Schedule::fromJsonString('{
+            "data": {
+                "first_schedule": {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                }
+            }
+        }', path: ['data', 'first_schedule']);
+        $this->assertEquals([
+            "@class" => Schedule::class,
+            "start" => 1,
+            "end" => 2,
+        ], $this->export($deser));
+
+        $deser = Schedule::listFromJsonString('{
+            "data": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                }
+            ]
+        }', path: 'data');
+        $this->assertEquals([
+            [
+                "@class" => Schedule::class,
+                "start" => 1,
+                "end" => 2,
+            ]
+        ], $this->export($deser));
+
+        $deser = Schedule::listFromJsonString('{
+            "data": {
+                "first_schedule": [
+                    {
+                        "schedule_start": 1,
+                        "schedule_end": 2
+                    }
+                ]
+            }
+        }', path: ['data', 'first_schedule']);
+        $this->assertEquals([
+            [
+                "@class" => Schedule::class,
+                "start" => 1,
+                "end" => 2,
+            ]
+        ], $this->export($deser));
+    }
 }
