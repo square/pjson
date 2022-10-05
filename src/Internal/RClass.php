@@ -16,6 +16,10 @@ class RClass
     {
         $this->rc = new ReflectionClass($class);
         $this->props = $this->rc->getProperties();
+
+        foreach ($this->props as $prop) {
+            $prop->setAccessible(true);
+        }
     }
 
     public static function make($class) : RClass

@@ -33,6 +33,7 @@ final class DeSerializationTest extends TestCase
             '@class' => get_class($value),
         ];
         foreach ($rc->getProperties() as $prop) {
+            $prop->setAccessible(true);
             $v = $prop->isInitialized($value) ? $prop->getValue($value) : null;
             $n = $prop->getName();
 
@@ -41,6 +42,7 @@ final class DeSerializationTest extends TestCase
 
         return $data;
     }
+
     public function testDeserializesSimpleClass()
     {
         $c = Category::fromJsonString('{"identifier":"myid","category_name":"Clothes","data":{"name":null}}');
