@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
-namespace Squareup\Pjson\Tests\php81;
+namespace Square\Pjson\Tests\php81;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Squareup\Pjson\Tests\Definitions\DTO;
+use Square\Pjson\Tests\Definitions\DTO;
 
 final class Php81DeSerializationTest extends TestCase
 {

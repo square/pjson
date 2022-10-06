@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Squareup\Pjson\Tests\Definitions;
+namespace Square\Pjson\Tests\Definitions;
 
-use Squareup\Pjson\Json;
+use Square\Pjson\Json;
 
 class Schedule extends AbstractSchedule
 {

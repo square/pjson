@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Squareup\Pjson;
+namespace Square\Pjson;
 
 use Attribute;
 use ReflectionNamedType;

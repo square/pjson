@@ -1,9 +1,9 @@
 {
-    "name": "squareup/pjson",
+    "name": "square/pjson",
     "autoload": {
         "psr-4": {
-            "Squareup\\Pjson\\": "src/",
-            "Squareup\\Pjson\\Tests\\": "tests/"
+            "Square\\Pjson\\": "src/",
+            "Square\\Pjson\\Tests\\": "tests/"
         }
     },
     "authors": [

@@ -11,8 +11,8 @@ It does so by using PHP8's attributes on class properties.
 ### Simple serialization of a class
 
 ```php
-use Squareup\Pjson\Json;
-use Squareup\Pjson\JsonSerialize;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 
 class Schedule
 {
@@ -54,8 +54,8 @@ Which would return an instance of class `Schedule` with the properties set accor
 The previous example can be made to use custom names in JSON instead of just the property name:
 
 ```php
-use Squareup\Pjson\Json;
-use Squareup\Pjson\JsonSerialize;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 
 class Schedule
 {
