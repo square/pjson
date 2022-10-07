@@ -2,6 +2,8 @@
 namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
@@ -18,6 +20,41 @@ final class SerializationTest extends TestCase
     {
         $c = new Category;
         $this->assertEquals('{"identifier":"myid","category_name":"Clothes","data":{"name":null}}', $c->toJson());
+    }
+
+    public function testSerializeAcceptsJsonFlags()
+    {
+        $c = new Category;
+        $expected = <<<JSON
+        {
+            "identifier": "myid",
+            "category_name": "Clothes",
+            "data": {
+                "name": null
+            }
+        }
+        JSON;
+
+
+        $this->assertEquals($expected, $c->toJson(flags: JSON_PRETTY_PRINT));
+    }
+
+    public function testSerializeThrowsOnJsonError()
+    {
+        $c = new class {
+            use JsonSerialize;
+
+            public function __construct(
+                #[Json]
+                private float $infinity = INF,
+            ) {
+                //
+            }
+        };
+
+        $this->expectException(\JsonException::class);
+        $this->expectExceptionMessage('Inf and NaN cannot be JSON encoded');
+        $c->toJson();
     }
 
     public function testOmitsEmptyValues()

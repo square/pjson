@@ -1,3 +1,5 @@
+includes:
+  - extension.neon
 parameters:
 	excludePaths:
 		- tests/Definitions/*
