@@ -46,9 +46,9 @@ trait JsonSerialize
     }
 
     public static function fromJsonString(
-        string $json, 
-        array|string $path = [], 
-        int $depth = 512, 
+        string $json,
+        array|string $path = [],
+        int $depth = 512,
         int $flags = 0,
     ) : static {
         $flags |= JSON_THROW_ON_ERROR;
@@ -57,9 +57,9 @@ trait JsonSerialize
     }
 
     public static function listFromJsonString(
-        string $json, 
+        string $json,
         array|string $path = [],
-        int $depth = 512, 
+        int $depth = 512,
         int $flags = 0,
     ) : array {
         $flags |= JSON_THROW_ON_ERROR;
