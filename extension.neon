@@ -1,4 +1,4 @@
 services:
-  - class: Squareup\Pjson\PHPStan\PropertiesExtension
+  - class: Square\Pjson\PHPStan\PropertiesExtension
     tags:
       - phpstan.properties.readWriteExtension

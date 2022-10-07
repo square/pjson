@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
-namespace Squareup\Pjson\Tests;
+namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Squareup\Pjson\Json;
-use Squareup\Pjson\JsonSerialize;
-use Squareup\Pjson\Tests\Definitions\BigCat;
-use Squareup\Pjson\Tests\Definitions\CatalogCategory;
-use Squareup\Pjson\Tests\Definitions\CatalogItem;
-use Squareup\Pjson\Tests\Definitions\CatalogObject;
-use Squareup\Pjson\Tests\Definitions\Category;
-use Squareup\Pjson\Tests\Definitions\Privateer;
-use Squareup\Pjson\Tests\Definitions\Schedule;
-use Squareup\Pjson\Tests\Definitions\Traitor;
-use Squareup\Pjson\Tests\Definitions\Weekend;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
+use Square\Pjson\Tests\Definitions\BigCat;
+use Square\Pjson\Tests\Definitions\CatalogCategory;
+use Square\Pjson\Tests\Definitions\CatalogItem;
+use Square\Pjson\Tests\Definitions\CatalogObject;
+use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\Privateer;
+use Square\Pjson\Tests\Definitions\Schedule;
+use Square\Pjson\Tests\Definitions\Traitor;
+use Square\Pjson\Tests\Definitions\Weekend;
 
 final class SerializationTest extends TestCase
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Squareup\Pjson\PHPStan;
+namespace Square\Pjson\PHPStan;
 
 use PHPStan\Reflection\PropertyReflection;
 use PHPStan\Rules\Properties\ReadWritePropertiesExtension;
 use ReflectionAttribute;
-use Squareup\Pjson\Json;
+use Square\Pjson\Json;
 
 class PropertiesExtension implements ReadWritePropertiesExtension
 {

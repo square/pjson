@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Squareup\Pjson\Tests\Definitions;
+namespace Square\Pjson\Tests\Definitions;
 
-use Squareup\Pjson\Json;
-use Squareup\Pjson\JsonSerialize;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 
 // phpcs:ignore PSR1.Classes.ClassDeclaration
 class Category

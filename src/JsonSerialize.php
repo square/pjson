@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Squareup\Pjson;
+namespace Square\Pjson;
 
 use ReflectionAttribute;
-use Squareup\Pjson\Internal\RClass;
+use Square\Pjson\Internal\RClass;
 use stdClass;
 use const JSON_THROW_ON_ERROR;
 

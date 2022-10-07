@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Squareup\Pjson\Internal;
+namespace Square\Pjson\Internal;
 
 use ReflectionClass;
 
