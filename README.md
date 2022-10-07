@@ -371,3 +371,13 @@ Schedule::fromJsonString('{
     }
 }', path: ['data', 'main']);
 ```
+
+## Use with PHPStan
+Using this library, you may have properties that don't appear to be read from or written to anywhere in your code, but
+are purely used for JSON serialization. PHPStan will complain about these issues, but you can help PHPStan understand
+that this is expected behavior by adding this library's extension in your `phpstan.neon`.
+
+```neon
+includes:
+  - vendor/squareup/pjson/extension.neon
+```
