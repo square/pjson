@@ -63,7 +63,13 @@ final class DeSerializationTest extends TestCase
           ], $this->export($c));
     }
 
+    public function testThrowsOnError()
+    {
+        $this->expectException(\JsonException::class);
+        $this->expectExceptionMessage('Syntax error');
 
+        $c = Category::fromJsonString('{"identifier":"myid","category_name":"Clothes","data":{"name":nil}}');
+    }
 
     public function testOmitsEmptyValues()
     {
