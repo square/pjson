@@ -12,6 +12,9 @@
             "email": "sebastien@squareup.com"
         }
     ],
+    "require": {
+        "php": ">=8.0"
+    },
     "require-dev": {
         "symfony/var-dumper": "^6.0",
         "phpunit/phpunit": "^9.5",
