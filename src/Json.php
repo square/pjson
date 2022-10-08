@@ -4,6 +4,7 @@ namespace Square\Pjson;
 use Attribute;
 use ReflectionNamedType;
 use ReflectionProperty;
+use Square\Pjson\Internal\RClass;
 use stdClass;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -60,7 +61,7 @@ class Json
         if ($type === null) {
             if (isset($this->type)) {
                 $t = $this->type;
-                return $t::fromJsonArray($data);
+                return $t::fromJsonData($data);
             }
             return $data;
         }
@@ -71,15 +72,22 @@ class Json
 
         if (!class_exists($type->getName()) && $type->getName() === 'array' && isset($this->type)) {
             $t = $this->type;
-            return array_map(fn ($d) => $t::fromJsonArray($d), $data);
+            return array_map(fn ($d) => $t::fromJsonData($d), $data);
         }
 
-        if (!$this->hasTrait($type->getName())) {
-            return $data;
+        if ($this->hasTrait($type->getName())) {
+            $n = $type->getName();
+            return $n::fromJsonData($data);
         }
 
-        $n = $type->getName();
-        return $n::fromJsonArray($data);
+        if (RClass::make($type->getName())->isBackedEnum()) {
+            if ($type->allowsNull()) {
+                return $type->getName()::tryFrom($data);
+            }
+            return $type->getName()::from($data);
+        }
+
+        return $data;
     }
 
     /**
@@ -158,10 +166,15 @@ class Json
             return $value;
         }
 
-        if (!$this->hasTrait($value)) {
-            return $value;
+        if ($this->hasTrait($value)) {
+            return $value->toJsonData();
         }
 
-        return $value->toJsonData();
+        if (RClass::make($value)->isSimpleEnum()) {
+            dump('yo');
+            return $value->name;
+        }
+
+        return $value;
     }
 }

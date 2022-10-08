@@ -14,13 +14,13 @@ abstract class CatalogObject
     #[Json]
     protected string $type;
 
-    public static function fromJsonArray(array $jd): static
+    public static function fromJsonData(array $jd): static
     {
         $t = $jd['type'];
 
         return match ($t) {
-            'category' => CatalogCategory::fromJsonArray($jd),
-            'item' => CatalogItem::fromJsonArray($jd),
+            'category' => CatalogCategory::fromJsonData($jd),
+            'item' => CatalogItem::fromJsonData($jd),
         };
     }
 }

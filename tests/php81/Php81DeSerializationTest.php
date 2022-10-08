@@ -4,6 +4,9 @@ namespace Square\Pjson\Tests\php81;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Square\Pjson\Tests\Definitions\DTO;
+use Square\Pjson\Tests\Definitions\Size;
+use Square\Pjson\Tests\Definitions\Status;
+use Square\Pjson\Tests\Definitions\Widget;
 
 final class Php81DeSerializationTest extends TestCase
 {
@@ -29,7 +32,7 @@ final class Php81DeSerializationTest extends TestCase
             '@class' => get_class($value),
         ];
         foreach ($rc->getProperties() as $prop) {
-            $v = $prop->isInitialized($value) ? $prop->getValue($value) : null;
+            $v = $prop->isInitialized($value) ? $prop->getValue($value) : '@uninitialized';
             $n = $prop->getName();
 
             $data[$n] = $this->export($v);
@@ -47,5 +50,64 @@ final class Php81DeSerializationTest extends TestCase
             '@class' => DTO::class,
             "value" => 6,
         ], $this->export($d));
+    }
+
+    public function testBackedEnum()
+    {
+        $w = Widget::fromJsonString('{
+            "status": "ON",
+            "optional": null
+        }');
+        $this->assertEquals([
+            "@class" => Widget::class,
+            "status" => [
+              "@class" => Status::class,
+              "name" => "ON",
+              "value" => "ON",
+            ],
+            "optional" => null,
+            "size" => '@uninitialized',
+        ], $this->export($w));
+    }
+
+    public function testEnum()
+    {
+        $w = Widget::fromJsonString('{
+            "status": "ON",
+            "optional": null,
+            "size": "BIG"
+        }');
+        $this->assertEquals([
+            "@class" => Widget::class,
+            "status" => [
+              "@class" => Status::class,
+              "name" => "ON",
+              "value" => "ON",
+            ],
+            "optional" => null,
+            "size" => [
+                '@class' => Size::class,
+                'name' => 'BIG',
+            ],
+        ], $this->export($w));
+
+        $w = Widget::fromJsonString('{
+            "status": "ON",
+            "optional": null,
+            "size": "big"
+        }');
+        $this->assertEquals([
+            "@class" => Widget::class,
+            "status" => [
+              "@class" => Status::class,
+              "name" => "ON",
+              "value" => "ON",
+            ],
+            "optional" => null,
+            "size" => [
+                '@class' => Size::class,
+                'name' => 'BIG',
+            ],
+        ], $this->export($w));
     }
 }

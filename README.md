@@ -280,7 +280,7 @@ class CatalogItem extends CatalogObject
 }
 ```
 
-You can implement the `fromJsonArray(array $array) : static` on `CatalogObject` to discriminate based on the received data and return the correct serialization:
+You can implement the `fromJsonData(array $array) : static` on `CatalogObject` to discriminate based on the received data and return the correct serialization:
 
 ```php
 abstract class CatalogObject
@@ -293,18 +293,18 @@ abstract class CatalogObject
     #[Json]
     protected string $type;
 
-    public static function fromJsonArray(array $jd): static
+    public static function fromJsonData(array $jd): static
     {
         $t = $jd['type'];
 
         return match ($t) {
-            'category' => CatalogCategory::fromJsonArray($jd),
-            'item' => CatalogItem::fromJsonArray($jd),
+            'category' => CatalogCategory::fromJsonData($jd),
+            'item' => CatalogItem::fromJsonData($jd),
         };
     }
 }
 ```
-**WARNING:** Make sure that each of the subclasses directly `use JsonSerialize`. Otherwise when they call `::fromJsonArray`, they would call the parent on `CatalogObject`
+**WARNING:** Make sure that each of the subclasses directly `use JsonSerialize`. Otherwise when they call `::fromJsonData`, they would call the parent on `CatalogObject`
 leading to infinite recursion.
 
 With this in place, we can do:
@@ -321,7 +321,7 @@ $this->assertEquals(CatalogItem::class, get_class($c));
 
 ### Lists
 
-If you're dealing with a list of things to deserialize, you can call `MyClass::listFromJsonString($json)` or `MyClass::listFromJsonArray($array)`. For example:
+If you're dealing with a list of things to deserialize, you can call `MyClass::listFromJsonString($json)` or `MyClass::listfromJsonData($array)`. For example:
 
 ```php
 Schedule::listFromJsonString('[

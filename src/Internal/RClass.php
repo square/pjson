@@ -2,7 +2,9 @@
 
 namespace Square\Pjson\Internal;
 
+use BackedEnum;
 use ReflectionClass;
+use UnitEnum;
 
 class RClass
 {
@@ -43,5 +45,20 @@ class RClass
     public function source() : ReflectionClass
     {
         return $this->rc;
+    }
+
+    public function isBackedEnum() : bool
+    {
+        return $this->rc->implementsInterface(BackedEnum::class);
+    }
+
+    public function isEnum() : bool
+    {
+        return $this->rc->implementsInterface(UnitEnum::class);
+    }
+
+    public function isSimpleEnum() : bool
+    {
+        return $this->isEnum() && !$this->isBackedEnum();
     }
 }
