@@ -15,7 +15,7 @@ trait JsonSerialize
         return json_encode($this->toJsonData(), flags: $flags, depth: $depth);
     }
 
-    public function toJsonData() : stdClass
+    public function toJsonData()
     {
         $r = RClass::make($this);
         $props = $r->getProperties();
@@ -78,7 +78,7 @@ trait JsonSerialize
         return array_map(fn ($d) => static::fromJsonData($d), $json);
     }
 
-    public static function fromJsonData(array $jd, array|string $path = []) : static
+    public static function fromJsonData($jd, array|string $path = []) : static
     {
         if (is_string($path)) {
             $path = [$path];

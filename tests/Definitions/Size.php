@@ -12,7 +12,7 @@ enum Size
     case BIG;
     case SMALL;
 
-    public static function fromJsonData(string $d, array|string $path = []): static
+    public static function fromJsonData($d, array|string $path = []): static
     {
         return match ($d) {
             'BIG' => self::BIG,
@@ -22,7 +22,7 @@ enum Size
         };
     }
 
-    public function toJsonData(): string
+    public function toJsonData()
     {
         return strtolower($this->name);
     }

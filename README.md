@@ -293,7 +293,7 @@ abstract class CatalogObject
     #[Json]
     protected string $type;
 
-    public static function fromJsonData(array $jd): static
+    public static function fromJsonData($jd): static
     {
         $t = $jd['type'];
 
