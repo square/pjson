@@ -47,7 +47,7 @@ class Json
     }
 
     /**
-     * Builds the PHP value from the json array data and a type if available
+     * Builds the PHP value from the json data and a type if available
      */
     public function retrieveValue(array $data, ?ReflectionNamedType $type = null)
     {
@@ -75,7 +75,8 @@ class Json
             return array_map(fn ($d) => $t::fromJsonData($d), $data);
         }
 
-        if ($this->hasTrait($type->getName())) {
+        if ($this->hasTrait($type->getName())
+            || RClass::make($type->getName())->source()->implementsInterface(FromJsonData::class)) {
             $n = $type->getName();
             return $n::fromJsonData($data);
         }
@@ -122,7 +123,7 @@ class Json
         $d = $data;
         foreach ($this->path as $i => $pathBit) {
             if (property_exists($d, $pathBit) && $i === $max) {
-                throw new \Exception('no bueno');
+                throw new \Exception('invalid path: '.json_encode($this->path));
             }
 
             if (!property_exists($d, $pathBit) && $i < $max) {
@@ -151,11 +152,7 @@ class Json
      */
     protected function hasTrait($valueOrType) : bool
     {
-        $classes = [$valueOrType, ...array_values(class_parents($valueOrType))];
-        $traits = [];
-        foreach ($classes as $class) {
-            $traits = array_merge($traits, class_uses($class));
-        }
+        $traits = class_uses($valueOrType);
 
         return array_key_exists(JsonSerialize::class, $traits);
     }
@@ -166,12 +163,11 @@ class Json
             return $value;
         }
 
-        if ($this->hasTrait($value)) {
+        if ($this->hasTrait($value) || $value instanceof ToJsonData) {
             return $value->toJsonData();
         }
 
         if (RClass::make($value)->isSimpleEnum()) {
-            dump('yo');
             return $value->name;
         }
 

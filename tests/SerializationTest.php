@@ -5,12 +5,14 @@ use PHPUnit\Framework\TestCase;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 use Square\Pjson\Tests\Definitions\BigCat;
+use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Privateer;
 use Square\Pjson\Tests\Definitions\Schedule;
+use Square\Pjson\Tests\Definitions\Stats;
 use Square\Pjson\Tests\Definitions\Traitor;
 use Square\Pjson\Tests\Definitions\Weekend;
 
@@ -213,5 +215,15 @@ final class SerializationTest extends TestCase
                 "schedule_end": 222
             }
         ]')), $jl);
+    }
+
+    public function testClassToScalar()
+    {
+        $stats = new Stats;
+        $stats->count = new BigInt("123456789876543234567898765432345678976543234567876543212345678765432");
+        $this->assertEquals(
+            '{"count":"123456789876543234567898765432345678976543234567876543212345678765432"}',
+            $stats->toJson()
+        );
     }
 }

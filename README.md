@@ -372,6 +372,106 @@ Schedule::fromJsonString('{
 }', path: ['data', 'main']);
 ```
 
+### Enums
+
+Backed enums are supported out of the box in PHP 8.1
+
+```php
+class Widget
+{
+    use JsonSerialize;
+
+    #[Json]
+    public Status $status;
+}
+
+enum Status : string
+{
+    case ON = 'ON';
+    case OFF = 'OFF';
+}
+$w = new Widget;
+$w->status = Status::ON;
+
+$w->toJson(); // {"status": "ON"}
+```
+
+And regular enums can be supported via the `JsonSerialize` trait or the `JsonDataSerializable` interface
+
+```php
+class Widget
+{
+    use JsonSerialize;
+
+    #[Json]
+    public Size $size;
+}
+
+enum Size
+{
+    use JsonSerialize;
+
+    case BIG;
+    case SMALL;
+
+    public static function fromJsonData($d, array|string $path = []): static
+    {
+        return match ($d) {
+            'BIG' => self::BIG,
+            'SMALL' => self::SMALL,
+            'big' => self::BIG,
+            'small' => self::SMALL,
+        };
+    }
+
+    public function toJsonData()
+    {
+        return strtolower($this->name);
+    }
+}
+
+$w = new Widget;
+$w->size = Size::BIG;
+
+$w->toJson(); // {"status": "big"}
+```
+
+### Scalar <=> Class
+In some cases, you might want a scalar value to become a PHP object once deserialized and vice-versa. For example, a `BigInt` class
+could hold an int as a string and represent it as a string when serialized to JSON:
+
+```php
+class Stats
+{
+    use JsonSerialize;
+
+    #[Json]
+    public BigInt $count;
+}
+
+class BigInt implements JsonDataSerializable
+{
+    public function __construct(
+        protected string $value,
+    ) {
+    }
+
+    public static function fromJsonData($jd, array|string $path = []) : static
+    {
+        return new BigInt($jd);
+    }
+
+    public function toJsonData()
+    {
+        return $this->value;
+    }
+}
+
+$stats = new Stats;
+$stats->count = new BigInt("123456789876543234567898765432345678976543234567876543212345678765432");
+$stats->toJson(); // {"count":"123456789876543234567898765432345678976543234567876543212345678765432"}
+```
+
 ## Use with PHPStan
 Using this library, you may have properties that don't appear to be read from or written to anywhere in your code, but
 are purely used for JSON serialization. PHPStan will complain about these issues, but you can help PHPStan understand

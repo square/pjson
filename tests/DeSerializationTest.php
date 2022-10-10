@@ -4,12 +4,14 @@ namespace Square\Pjson\Tests;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Square\Pjson\Tests\Definitions\BigCat;
+use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
+use Square\Pjson\Tests\Definitions\Stats;
 use Square\Pjson\Tests\Definitions\Traitor;
 use Square\Pjson\Tests\Definitions\Weekend;
 
@@ -437,5 +439,19 @@ final class DeSerializationTest extends TestCase
                 "end" => 2,
             ]
         ], $this->export($deser));
+    }
+
+    public function testClassToScalar()
+    {
+        $stats =Stats::fromJsonString('{
+            "count": "123456789876543234567898765432345678976543234567876543212345678765432"
+        }');
+        $this->assertEquals([
+            "@class" => Stats::class,
+            "count" => [
+              "@class" => BigInt::class,
+              "value" => "123456789876543234567898765432345678976543234567876543212345678765432",
+            ]
+        ], $this->export($stats));
     }
 }
