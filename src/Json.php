@@ -66,26 +66,25 @@ class Json
             return $data;
         }
 
-        if (!class_exists($type->getName()) && ($type->getName() !== 'array' || !isset($this->type))) {
+        $typename = $type->getName();
+
+        if (!class_exists($typename) && ($typename !== 'array' || !isset($this->type))) {
             return $data;
         }
 
-        if (!class_exists($type->getName()) && $type->getName() === 'array' && isset($this->type)) {
-            $t = $this->type;
-            return array_map(fn ($d) => $t::fromJsonData($d), $data);
+        if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
+            return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
         }
 
-        if ($this->hasTrait($type->getName())
-            || RClass::make($type->getName())->source()->implementsInterface(FromJsonData::class)) {
-            $n = $type->getName();
-            return $n::fromJsonData($data);
+        if (RClass::make($typename)->readsFromJson()) {
+            return $typename::fromJsonData($data);
         }
 
-        if (RClass::make($type->getName())->isBackedEnum()) {
+        if (RClass::make($typename)->isBackedEnum()) {
             if ($type->allowsNull()) {
-                return $type->getName()::tryFrom($data);
+                return $typename::tryFrom($data);
             }
-            return $type->getName()::from($data);
+            return $typename::from($data);
         }
 
         return $data;
@@ -147,23 +146,13 @@ class Json
         }
     }
 
-    /**
-     * Check that a target type has the JsonSerialize trait
-     */
-    protected function hasTrait($valueOrType) : bool
-    {
-        $traits = class_uses($valueOrType);
-
-        return array_key_exists(JsonSerialize::class, $traits);
-    }
-
     protected function jsonValue($value)
     {
         if (!is_object($value)) {
             return $value;
         }
 
-        if ($this->hasTrait($value) || $value instanceof ToJsonData) {
+        if (RClass::make($value)->writesToJson()) {
             return $value->toJsonData();
         }
 
