@@ -4,6 +4,7 @@ namespace Square\Pjson;
 use Attribute;
 use ReflectionNamedType;
 use ReflectionProperty;
+use Square\Pjson\Internal\RClass;
 use stdClass;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -46,7 +47,7 @@ class Json
     }
 
     /**
-     * Builds the PHP value from the json array data and a type if available
+     * Builds the PHP value from the json data and a type if available
      */
     public function retrieveValue(array $data, ?ReflectionNamedType $type = null)
     {
@@ -60,26 +61,33 @@ class Json
         if ($type === null) {
             if (isset($this->type)) {
                 $t = $this->type;
-                return $t::fromJsonArray($data);
+                return $t::fromJsonData($data);
             }
             return $data;
         }
 
-        if (!class_exists($type->getName()) && ($type->getName() !== 'array' || !isset($this->type))) {
+        $typename = $type->getName();
+
+        if (!class_exists($typename) && ($typename !== 'array' || !isset($this->type))) {
             return $data;
         }
 
-        if (!class_exists($type->getName()) && $type->getName() === 'array' && isset($this->type)) {
-            $t = $this->type;
-            return array_map(fn ($d) => $t::fromJsonArray($d), $data);
+        if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
+            return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
         }
 
-        if (!$this->hasTrait($type->getName())) {
-            return $data;
+        if (RClass::make($typename)->readsFromJson()) {
+            return $typename::fromJsonData($data);
         }
 
-        $n = $type->getName();
-        return $n::fromJsonArray($data);
+        if (RClass::make($typename)->isBackedEnum()) {
+            if ($type->allowsNull()) {
+                return $typename::tryFrom($data);
+            }
+            return $typename::from($data);
+        }
+
+        return $data;
     }
 
     /**
@@ -114,7 +122,7 @@ class Json
         $d = $data;
         foreach ($this->path as $i => $pathBit) {
             if (property_exists($d, $pathBit) && $i === $max) {
-                throw new \Exception('no bueno');
+                throw new \Exception('invalid path: '.json_encode($this->path));
             }
 
             if (!property_exists($d, $pathBit) && $i < $max) {
@@ -138,30 +146,20 @@ class Json
         }
     }
 
-    /**
-     * Check that a target type has the JsonSerialize trait
-     */
-    protected function hasTrait($valueOrType) : bool
-    {
-        $classes = [$valueOrType, ...array_values(class_parents($valueOrType))];
-        $traits = [];
-        foreach ($classes as $class) {
-            $traits = array_merge($traits, class_uses($class));
-        }
-
-        return array_key_exists(JsonSerialize::class, $traits);
-    }
-
     protected function jsonValue($value)
     {
         if (!is_object($value)) {
             return $value;
         }
 
-        if (!$this->hasTrait($value)) {
-            return $value;
+        if (RClass::make($value)->writesToJson()) {
+            return $value->toJsonData();
         }
 
-        return $value->toJsonData();
+        if (RClass::make($value)->isSimpleEnum()) {
+            return $value->name;
+        }
+
+        return $value;
     }
 }

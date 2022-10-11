@@ -280,7 +280,7 @@ class CatalogItem extends CatalogObject
 }
 ```
 
-You can implement the `fromJsonArray(array $array) : static` on `CatalogObject` to discriminate based on the received data and return the correct serialization:
+You can implement the `fromJsonData(array $array) : static` on `CatalogObject` to discriminate based on the received data and return the correct serialization:
 
 ```php
 abstract class CatalogObject
@@ -293,18 +293,18 @@ abstract class CatalogObject
     #[Json]
     protected string $type;
 
-    public static function fromJsonArray(array $jd): static
+    public static function fromJsonData($jd): static
     {
         $t = $jd['type'];
 
         return match ($t) {
-            'category' => CatalogCategory::fromJsonArray($jd),
-            'item' => CatalogItem::fromJsonArray($jd),
+            'category' => CatalogCategory::fromJsonData($jd),
+            'item' => CatalogItem::fromJsonData($jd),
         };
     }
 }
 ```
-**WARNING:** Make sure that each of the subclasses directly `use JsonSerialize`. Otherwise when they call `::fromJsonArray`, they would call the parent on `CatalogObject`
+**WARNING:** Make sure that each of the subclasses directly `use JsonSerialize`. Otherwise when they call `::fromJsonData`, they would call the parent on `CatalogObject`
 leading to infinite recursion.
 
 With this in place, we can do:
@@ -321,7 +321,7 @@ $this->assertEquals(CatalogItem::class, get_class($c));
 
 ### Lists
 
-If you're dealing with a list of things to deserialize, you can call `MyClass::listFromJsonString($json)` or `MyClass::listFromJsonArray($array)`. For example:
+If you're dealing with a list of things to deserialize, you can call `MyClass::listFromJsonString($json)` or `MyClass::listfromJsonData($array)`. For example:
 
 ```php
 Schedule::listFromJsonString('[
@@ -370,6 +370,106 @@ Schedule::fromJsonString('{
         }
     }
 }', path: ['data', 'main']);
+```
+
+### Enums
+
+Backed enums are supported out of the box in PHP 8.1
+
+```php
+class Widget
+{
+    use JsonSerialize;
+
+    #[Json]
+    public Status $status;
+}
+
+enum Status : string
+{
+    case ON = 'ON';
+    case OFF = 'OFF';
+}
+$w = new Widget;
+$w->status = Status::ON;
+
+$w->toJson(); // {"status": "ON"}
+```
+
+And regular enums can be supported via the `JsonSerialize` trait or the `JsonDataSerializable` interface
+
+```php
+class Widget
+{
+    use JsonSerialize;
+
+    #[Json]
+    public Size $size;
+}
+
+enum Size
+{
+    use JsonSerialize;
+
+    case BIG;
+    case SMALL;
+
+    public static function fromJsonData($d, array|string $path = []): static
+    {
+        return match ($d) {
+            'BIG' => self::BIG,
+            'SMALL' => self::SMALL,
+            'big' => self::BIG,
+            'small' => self::SMALL,
+        };
+    }
+
+    public function toJsonData()
+    {
+        return strtolower($this->name);
+    }
+}
+
+$w = new Widget;
+$w->size = Size::BIG;
+
+$w->toJson(); // {"status": "big"}
+```
+
+### Scalar <=> Class
+In some cases, you might want a scalar value to become a PHP object once deserialized and vice-versa. For example, a `BigInt` class
+could hold an int as a string and represent it as a string when serialized to JSON:
+
+```php
+class Stats
+{
+    use JsonSerialize;
+
+    #[Json]
+    public BigInt $count;
+}
+
+class BigInt implements JsonDataSerializable
+{
+    public function __construct(
+        protected string $value,
+    ) {
+    }
+
+    public static function fromJsonData($jd, array|string $path = []) : static
+    {
+        return new BigInt($jd);
+    }
+
+    public function toJsonData()
+    {
+        return $this->value;
+    }
+}
+
+$stats = new Stats;
+$stats->count = new BigInt("123456789876543234567898765432345678976543234567876543212345678765432");
+$stats->toJson(); // {"count":"123456789876543234567898765432345678976543234567876543212345678765432"}
 ```
 
 ## Use with PHPStan

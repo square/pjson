@@ -2,7 +2,12 @@
 
 namespace Square\Pjson\Internal;
 
+use BackedEnum;
 use ReflectionClass;
+use Square\Pjson\FromJsonData;
+use UnitEnum;
+use Square\Pjson\JsonSerialize;
+use Square\Pjson\ToJsonData;
 
 class RClass
 {
@@ -43,5 +48,44 @@ class RClass
     public function source() : ReflectionClass
     {
         return $this->rc;
+    }
+
+    public function isBackedEnum() : bool
+    {
+        return $this->rc->implementsInterface(BackedEnum::class);
+    }
+
+    public function isEnum() : bool
+    {
+        return $this->rc->implementsInterface(UnitEnum::class);
+    }
+
+    public function isSimpleEnum() : bool
+    {
+        return $this->isEnum() && !$this->isBackedEnum();
+    }
+
+    /**
+     * True if the type either implements the FromJsonData interface or directly uses the JsonSerialize trait
+     *
+     * @return boolean
+     */
+    public function readsFromJson() : bool
+    {
+        $traits = class_uses($this->rc->getName());
+
+        return array_key_exists(JsonSerialize::class, $traits) || $this->rc->implementsInterface(FromJsonData::class);
+    }
+
+    /**
+     * True if the type either implements the ToJsonData interface or directly uses the JsonSerialize trait
+     *
+     * @return boolean
+     */
+    public function writesToJson() : bool
+    {
+        $traits = class_uses($this->rc->getName());
+
+        return array_key_exists(JsonSerialize::class, $traits) || $this->rc->implementsInterface(ToJsonData::class);
     }
 }

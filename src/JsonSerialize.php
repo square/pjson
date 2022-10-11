@@ -15,7 +15,7 @@ trait JsonSerialize
         return json_encode($this->toJsonData(), flags: $flags, depth: $depth);
     }
 
-    public function toJsonData() : stdClass
+    public function toJsonData()
     {
         $r = RClass::make($this);
         $props = $r->getProperties();
@@ -53,7 +53,7 @@ trait JsonSerialize
     ) : static {
         $flags |= JSON_THROW_ON_ERROR;
         $jd = json_decode($json, associative: true, flags: $flags, depth: $depth);
-        return self::fromJsonArray($jd, $path);
+        return self::fromJsonData($jd, $path);
     }
 
     public static function listFromJsonString(
@@ -64,10 +64,10 @@ trait JsonSerialize
     ) : array {
         $flags |= JSON_THROW_ON_ERROR;
         $jd = json_decode($json, associative: true, flags: $flags, depth: $depth);
-        return static::listFromJsonArray($jd, $path);
+        return static::listfromJsonData($jd, $path);
     }
 
-    public static function listFromJsonArray(array $json, array|string $path = []) : array
+    public static function listfromJsonData(array $json, array|string $path = []) : array
     {
         if (is_string($path)) {
             $path = [$path];
@@ -75,10 +75,10 @@ trait JsonSerialize
         foreach ($path as $pathBit) {
             $json = $json[$pathBit];
         }
-        return array_map(fn ($d) => static::fromJsonArray($d), $json);
+        return array_map(fn ($d) => static::fromJsonData($d), $json);
     }
 
-    public static function fromJsonArray(array $jd, array|string $path = []) : static
+    public static function fromJsonData($jd, array|string $path = []) : static
     {
         if (is_string($path)) {
             $path = [$path];

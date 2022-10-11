@@ -2,10 +2,13 @@
 
 namespace Square\Pjson\Tests\Definitions;
 
-use Square\Pjson\JsonDataSerializable;
+use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-class AbstractSchedule implements JsonDataSerializable
+class Stats
 {
     use JsonSerialize;
+
+    #[Json]
+    public BigInt $count;
 }
