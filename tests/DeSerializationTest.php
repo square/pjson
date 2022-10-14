@@ -3,12 +3,15 @@ namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
 use Square\Pjson\Tests\Definitions\Stats;
@@ -454,4 +457,22 @@ final class DeSerializationTest extends TestCase
             ]
         ], $this->export($stats));
     }
+
+    public function testIntegerPath()
+    {
+        $json = '{
+            "menus": [
+                {"main": true, "name": "main-menu"},
+                {"main": false, "name": "secondary-menu"}
+            ]
+        }';
+
+        $dl = MenuList::fromJsonString($json);
+
+        $this->assertEquals([
+            "@class" => MenuList::class,
+            "mainMenuName" => "main-menu"
+        ], $this->export($dl));
+    }
 }
+

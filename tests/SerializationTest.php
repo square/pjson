@@ -10,6 +10,7 @@ use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Privateer;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Stats;
@@ -225,5 +226,21 @@ final class SerializationTest extends TestCase
             '{"count":"123456789876543234567898765432345678976543234567876543212345678765432"}',
             $stats->toJson()
         );
+    }
+
+    public function testIntegerPath()
+    {
+        $json = '{
+            "menus": [
+                {"main": true, "name": "main-menu"},
+                {"main": false, "name": "secondary-menu"}
+            ]
+        }';
+
+        $dl = MenuList::fromJsonString($json);
+
+        // MenuList doesn't store the entire structure. Only the name of the first menu
+        // it can however still output all the data it has back into its original shape
+        $this->assertEquals('{"menus":[{"name":"main-menu"}]}', $dl->toJson());
     }
 }
