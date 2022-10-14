@@ -113,34 +113,34 @@ class Json
     /**
      * Appends the given value to an array of data on the path to serializing to a JSON string
      */
-    public function appendValue(object $data, $value)
+    public function appendValue(array &$data, $value)
     {
         if ($this->omit_empty && $this->isEmpty($value)) {
             return;
         }
         $max = count($this->path)-1;
-        $d = $data;
+        $d = &$data;
         foreach ($this->path as $i => $pathBit) {
-            if (property_exists($d, $pathBit) && $i === $max) {
+            if (array_key_exists($pathBit, $d) && $i === $max) {
                 throw new \Exception('invalid path: '.json_encode($this->path));
             }
 
-            if (!property_exists($d, $pathBit) && $i < $max) {
-                $d->$pathBit = new stdClass;
+            if (!array_key_exists($pathBit, $d) && $i < $max) {
+                $d[$pathBit] = [];
             }
 
             if ($i < $max) {
-                $d = $data->$pathBit;
+                $d = &$d[$pathBit];
             }
 
             if ($i === $max) {
                 if (is_array($value)) {
-                    $d->$pathBit = [];
+                    $d[$pathBit] = [];
                     foreach ($value as $k => $val) {
-                        $d->$pathBit[$k] = $this->jsonValue($val);
+                        $d[$pathBit][$k] = $this->jsonValue($val);
                     }
                 } else {
-                    $d->$pathBit = $this->jsonValue($value);
+                    $d[$pathBit] = $this->jsonValue($value);
                 }
             }
         }

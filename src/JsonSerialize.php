@@ -19,7 +19,7 @@ trait JsonSerialize
     {
         $r = RClass::make($this);
         $props = $r->getProperties();
-        $d = new stdClass;
+        $d = [];
         foreach ($props as $prop) {
             $attrs = $prop->getAttributes(Json::class, ReflectionAttribute::IS_INSTANCEOF);
             if (empty($attrs)) {
