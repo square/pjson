@@ -515,3 +515,32 @@ $casts = [
     'schedule' => Schedule::class,
 ];
 ```
+
+Alternatively, you can simply use Laravel's cast arguments. In this case the `Schedule` class stays the way it used to be:
+
+```php
+class Schedule implements
+{
+    use JsonSerialize;
+
+    #[Json]
+    protected int $start;
+
+    #[Json]
+    protected int $end;
+
+    public function __construct(int $start, int $end)
+    {
+        $this->start = $start;
+        $this->end = $end;
+    }
+}
+```
+
+And you provide the class target of the cast like:
+
+```php
+$casts = [
+    'schedule' => JsonCaster::class.':'.Schedule::class,
+];
+```
