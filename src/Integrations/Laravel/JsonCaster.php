@@ -8,7 +8,8 @@ class JsonCaster implements CastsAttributes
 {
     public function __construct(
         protected string $target
-    ){}
+    ) {
+    }
 
     public function get($model, $key, $value, $attributes)
     {
