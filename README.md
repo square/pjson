@@ -481,3 +481,37 @@ that this is expected behavior by adding this library's extension in your `phpst
 includes:
   - vendor/square/pjson/extension.neon
 ```
+
+## Laravel Integration
+
+If you wish to cast Eloquent model attributes to classes via Pjson, you might do so with the provided casting utilities:
+
+```php
+use Illuminate\Contracts\Database\Eloquent\Castable;
+
+class Schedule implements Castable // implement the laravel interface
+{
+    use JsonSerialize;
+    use JsonCastable; // use the provided Pjson trait
+
+    #[Json]
+    protected int $start;
+
+    #[Json]
+    protected int $end;
+
+    public function __construct(int $start, int $end)
+    {
+        $this->start = $start;
+        $this->end = $end;
+    }
+}
+```
+
+Then in your Eloquent model:
+
+```php
+$casts = [
+    'schedule' => Schedule::class,
+];
+```
