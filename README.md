@@ -484,6 +484,8 @@ includes:
 
 ## Laravel Integration
 
+### via castable
+
 If you wish to cast Eloquent model attributes to classes via Pjson, you might do so with the provided casting utilities:
 
 ```php
@@ -515,6 +517,8 @@ $casts = [
     'schedule' => Schedule::class,
 ];
 ```
+
+### via cast arguments
 
 Alternatively, you can simply use Laravel's cast arguments. In this case the `Schedule` class stays the way it used to be:
 
