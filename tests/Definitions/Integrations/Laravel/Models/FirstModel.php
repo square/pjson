@@ -14,7 +14,9 @@ class FirstModel extends Model
     public $timestamps = false;
 
     protected $casts = [
+        // Using laravel's castable interface
         'castable_address' => CastableAddress::class,
+        // Using cast attributes
         'address' => JsonCaster::class.':'.Address::class,
     ];
 }
