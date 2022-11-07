@@ -481,3 +481,76 @@ that this is expected behavior by adding this library's extension in your `phpst
 includes:
   - vendor/square/pjson/extension.neon
 ```
+
+## Laravel Integration
+
+### via castable
+
+If you wish to cast Eloquent model attributes to classes via Pjson, you might do so with the provided casting utilities:
+
+```php
+use Illuminate\Contracts\Database\Eloquent\Castable;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
+use Square\Pjson\Integrations\Laravel\JsonCastable;
+
+class Schedule implements Castable // implement the laravel interface
+{
+    use JsonSerialize;
+    use JsonCastable; // use the provided Pjson trait
+
+    #[Json]
+    protected int $start;
+
+    #[Json]
+    protected int $end;
+
+    public function __construct(int $start, int $end)
+    {
+        $this->start = $start;
+        $this->end = $end;
+    }
+}
+```
+
+Then in your Eloquent model:
+
+```php
+$casts = [
+    'schedule' => Schedule::class,
+];
+```
+
+### via cast arguments
+
+Alternatively, you can simply use Laravel's cast arguments. In this case the `Schedule` class stays the way it used to be:
+
+```php
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
+
+class Schedule
+{
+    use JsonSerialize;
+
+    #[Json]
+    protected int $start;
+
+    #[Json]
+    protected int $end;
+
+    public function __construct(int $start, int $end)
+    {
+        $this->start = $start;
+        $this->end = $end;
+    }
+}
+```
+
+And you provide the class target of the cast like:
+
+```php
+$casts = [
+    'schedule' => JsonCaster::class.':'.Schedule::class,
+];
+```
