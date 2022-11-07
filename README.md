@@ -490,6 +490,9 @@ If you wish to cast Eloquent model attributes to classes via Pjson, you might do
 
 ```php
 use Illuminate\Contracts\Database\Eloquent\Castable;
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
+use Square\Pjson\Integrations\Laravel\JsonCastable;
 
 class Schedule implements Castable // implement the laravel interface
 {
@@ -523,6 +526,9 @@ $casts = [
 Alternatively, you can simply use Laravel's cast arguments. In this case the `Schedule` class stays the way it used to be:
 
 ```php
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
+
 class Schedule
 {
     use JsonSerialize;
