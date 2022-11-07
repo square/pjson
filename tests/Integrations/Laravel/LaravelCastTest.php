@@ -42,4 +42,44 @@ class LaravelCastTest extends TestCase
         $this->assertEquals(Address::class, get_class($oaddr));
         $this->assertEquals($addr, $oaddr->toJson());
     }
+
+    public function testNullCase()
+    {
+        (new FirstModel([
+            'name' => 'jane',
+            'castable_address' => null,
+            'address' => null,
+        ]))->save();
+        $m = FirstModel::query()->first();
+        $this->assertTrue(null === $m->getAttributes()['castable_address']);
+        $this->assertTrue(null === $m->castable_address);
+        $this->assertTrue(null === $m->getAttributes()['address']);
+        $this->assertTrue(null === $m->address);
+    }
+
+    public function testNotSet()
+    {
+        (new FirstModel([
+            'name' => 'jane',
+        ]))->save();
+        $m = FirstModel::query()->first();
+        $this->assertTrue(null === $m->getAttributes()['castable_address']);
+        $this->assertTrue(null === $m->castable_address);
+        $this->assertTrue(null === $m->getAttributes()['address']);
+        $this->assertTrue(null === $m->address);
+    }
+
+    public function testEmptyString()
+    {
+        FirstModel::query()->insert([
+            'name' => 'jane',
+            'castable_address' => '',
+            'address' => '',
+        ]);
+        $m = FirstModel::query()->first();
+        $this->assertTrue('' === $m->getAttributes()['castable_address']);
+        $this->assertTrue('' === $m->castable_address);
+        $this->assertTrue('' === $m->getAttributes()['address']);
+        $this->assertTrue('' === $m->address);
+    }
 }

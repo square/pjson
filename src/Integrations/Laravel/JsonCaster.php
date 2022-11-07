@@ -13,11 +13,15 @@ class JsonCaster implements CastsAttributes
 
     public function get($model, $key, $value, $attributes)
     {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
         return $this->target::fromJsonString($value);
     }
 
     public function set($model, $key, $value, $attributes)
     {
-        return $value->toJson();
+        return $value?->toJson();
     }
 }
