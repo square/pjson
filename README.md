@@ -523,7 +523,7 @@ $casts = [
 Alternatively, you can simply use Laravel's cast arguments. In this case the `Schedule` class stays the way it used to be:
 
 ```php
-class Schedule implements
+class Schedule
 {
     use JsonSerialize;
 
