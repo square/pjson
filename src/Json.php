@@ -61,7 +61,10 @@ class Json
         if ($type === null) {
             if (isset($this->type)) {
                 $t = $this->type;
-                return $t::fromJsonData($data);
+                if (RClass::make($t)->readsFromJson()) {
+                    return $t::fromJsonData($data);
+                }
+                return Pjson::fromJsonData($data, $t);
             }
             return $data;
         }
@@ -73,7 +76,10 @@ class Json
         }
 
         if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
-            return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
+            if (RClass::make($this->type)->readsFromJson()) {
+                return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
+            }
+            return array_map(fn ($d) => Pjson::fromJsonData($d, $this->type), $data);
         }
 
         if (RClass::make($typename)->readsFromJson()) {
@@ -85,6 +91,10 @@ class Json
                 return $typename::tryFrom($data);
             }
             return $typename::from($data);
+        }
+
+        if (RClass::make($typename)->hasJsonAttribute()) {
+            return Pjson::fromJsonData($data, $typename);
         }
 
         return $data;
