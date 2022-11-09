@@ -3,8 +3,10 @@
 namespace Square\Pjson\Internal;
 
 use BackedEnum;
+use ReflectionAttribute;
 use ReflectionClass;
 use Square\Pjson\FromJsonData;
+use Square\Pjson\Json;
 use UnitEnum;
 use Square\Pjson\JsonSerialize;
 use Square\Pjson\ToJsonData;
@@ -87,5 +89,17 @@ class RClass
         $traits = class_uses($this->rc->getName());
 
         return array_key_exists(JsonSerialize::class, $traits) || $this->rc->implementsInterface(ToJsonData::class);
+    }
+
+    public function hasJsonAttribute() : bool
+    {
+        foreach ($this->props as $prop) {
+            $attrs = $prop->getAttributes(Json::class, ReflectionAttribute::IS_INSTANCEOF);
+            if (!empty($attrs)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
