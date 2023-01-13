@@ -94,6 +94,7 @@ final class SerializationTest extends TestCase
         $c = new Category;
         $c->setSchedule(new Schedule(1, 20));
         $c->setUpcoming([new Schedule(1, 20), new Schedule(30, 40)]);
+        $c->setNullable();
         $this->assertEquals(json_encode(json_decode('{
             "identifier": "myid",
             "category_name": "Clothes",
@@ -113,7 +114,8 @@ final class SerializationTest extends TestCase
                     "schedule_start": 30,
                     "schedule_end": 40
                 }
-            ]
+            ],
+            "nullable_schedules": null
         }')), $c->toJson());
     }
 
