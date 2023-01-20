@@ -3,14 +3,14 @@ namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Square\Pjson\Json;
-use Square\Pjson\JsonSerialize;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\Collection;
+use Square\Pjson\Tests\Definitions\Collector;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
@@ -473,5 +473,65 @@ final class DeSerializationTest extends TestCase
             "@class" => MenuList::class,
             "mainMenuName" => "main-menu"
         ], $this->export($dl));
+    }
+
+    public function testDeserializesCollections()
+    {
+        $json = '{
+            "schedules": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                {
+                    "schedule_start": 10,
+                    "schedule_end": 20
+                }
+            ],
+            "factoried_schedules": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                {
+                    "schedule_start": 10,
+                    "schedule_end": 20
+                }
+            ],
+            "static_factoried_schedules": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                {
+                    "schedule_start": 10,
+                    "schedule_end": 20
+                }
+            ]
+        }';
+
+        $data = Collector::fromJsonString($json);
+
+        $collectionStructure = [
+            "@class" => Collection::class,
+            "items" => [
+                [
+                    "@class" => Schedule::class,
+                    "start" => 1,
+                    "end" => 2,
+                ],
+                [
+                    "@class" => Schedule::class,
+                    "start" => 10,
+                    "end" => 20,
+                ],
+            ]
+        ];
+        $this->assertEquals([
+            "@class" => Collector::class,
+            "schedules" => $collectionStructure,
+            "factoried_schedules" => $collectionStructure,
+            "static_factoried_schedules" => $collectionStructure,
+        ], $this->export($data));
     }
 }
