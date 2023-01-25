@@ -260,7 +260,7 @@ class Collector
     #[Json(type: Schedule::class)]
     public Collection $schedules;
 
-    #[Json(type: Schedule::class, collection_factory_method: '::make')]
+    #[Json(type: Schedule::class, collection_factory_method: 'make')]
     public Collection $static_factoried_schedules;
 
     #[Json(type: Schedule::class, collection_factory_method: 'makeme')]
@@ -268,7 +268,7 @@ class Collector
 }
 ```
 
-Here our collection has a static factory method `::make` and an instance method `makeme` that could each be used. The constructor option also works.
+Here our collection has a static factory method `make` and an instance method `makeme` that could each be used. The constructor option also works.
 You can look at the collection class in the `tests/Definitions` directory.
 
 This would allow you to work with json like:

@@ -65,6 +65,11 @@ class RClass
         return $this->isEnum() && !$this->isBackedEnum();
     }
 
+    public function isMethodStatic(string $methodName) : bool
+    {
+        return $this->rc->getMethod($methodName)->isStatic();
+    }
+
     /**
      * True if the type either implements the FromJsonData interface or directly uses the JsonSerialize trait
      *

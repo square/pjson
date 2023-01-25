@@ -88,7 +88,7 @@ class Json
             if (!isset($this->collection_factory_method) || $this->collection_factory_method === '') {
                 return new $typename($mapped);
             }
-            if (str_starts_with($this->collection_factory_method, '::')) {
+            if (RClass::make($typename)->isMethodStatic($this->collection_factory_method)) {
                 return $typename::{trim($this->collection_factory_method, ':')}($mapped);
             }
 

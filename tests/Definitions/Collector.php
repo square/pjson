@@ -12,7 +12,7 @@ class Collector
     #[Json(type: Schedule::class)]
     public Collection $schedules;
 
-    #[Json(type: Schedule::class, collection_factory_method: '::make')]
+    #[Json(type: Schedule::class, collection_factory_method: 'make')]
     public Collection $static_factoried_schedules;
 
     #[Json(type: Schedule::class, collection_factory_method: 'makeme')]
