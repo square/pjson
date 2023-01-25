@@ -5,7 +5,7 @@ use Attribute;
 use ReflectionNamedType;
 use ReflectionProperty;
 use Square\Pjson\Internal\RClass;
-use stdClass;
+use Traversable;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Json
@@ -16,8 +16,14 @@ class Json
 
     protected bool $omit_empty;
 
-    public function __construct(string|array $path = '', string $type = '', bool $omit_empty = false)
-    {
+    protected string $collection_factory_method;
+
+    public function __construct(
+        string|array $path = '',
+        string $type = '',
+        bool $omit_empty = false,
+        string $collection_factory_method = ''
+    ) {
         if ($path !== '') {
             if (is_string($path)) {
                 $path = [$path];
@@ -30,6 +36,7 @@ class Json
         }
 
         $this->omit_empty = $omit_empty;
+        $this->collection_factory_method = $collection_factory_method;
     }
 
     /**
@@ -71,9 +78,24 @@ class Json
         if (!class_exists($typename) && ($typename !== 'array' || !isset($this->type))) {
             return $data;
         }
-
         if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
             return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
+        }
+
+        // Deal with collections / Traversable classes
+        if (class_exists($typename) && $this->isCollection($typename) && isset($this->type)) {
+            $mapped = array_map(fn ($d) => $this->type::fromJsonData($d), $data);
+            if (!isset($this->collection_factory_method) || $this->collection_factory_method === '') {
+                return new $typename($mapped);
+            }
+            if (RClass::make($typename)->isMethodStatic($this->collection_factory_method)) {
+                return $typename::{trim($this->collection_factory_method, ':')}($mapped);
+            }
+
+            $r = RClass::make($typename);
+            $instance = $r->source()->newInstanceWithoutConstructor();
+            $instance->{$this->collection_factory_method}($mapped);
+            return $instance;
         }
 
         if (RClass::make($typename)->readsFromJson()) {
@@ -88,6 +110,11 @@ class Json
         }
 
         return $data;
+    }
+
+    protected function isCollection(string $className)
+    {
+        return is_subclass_of($className, Traversable::class);
     }
 
     /**
@@ -134,7 +161,7 @@ class Json
             }
 
             if ($i === $max) {
-                if (is_array($value)) {
+                if (is_array($value) || $value instanceof Traversable) {
                     $d[$pathBit] = [];
                     foreach ($value as $k => $val) {
                         $d[$pathBit][$k] = $this->jsonValue($val);

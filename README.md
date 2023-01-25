@@ -246,6 +246,56 @@ Week^ {#353
 }
 ```
 
+### Collection Classes
+
+Similar to arrays, you might want to use collection classes. You can do so as long as your classes implement the `Traversable` interface.
+In this case, pjson will by default try to construct your class by passing in the array of data in the constructor.
+If this doesn't work for you, you can specify a custom factory method for your collections:
+
+```php
+class Collector
+{
+    use JsonSerialize;
+
+    #[Json(type: Schedule::class)]
+    public Collection $schedules;
+
+    #[Json(type: Schedule::class, collection_factory_method: 'make')]
+    public Collection $static_factoried_schedules;
+
+    #[Json(type: Schedule::class, collection_factory_method: 'makeme')]
+    public Collection $factoried_schedules;
+}
+```
+
+Here our collection has a static factory method `make` and an instance method `makeme` that could each be used. The constructor option also works.
+You can look at the collection class in the `tests/Definitions` directory.
+
+This would allow you to work with json like:
+
+```json
+{
+    "schedules": [
+        {
+            "schedule_start": 1,
+            "schedule_end": 2
+        }
+    ],
+    "factoried_schedules": [
+        {
+            "schedule_start": 10,
+            "schedule_end": 20
+        }
+    ],
+    "static_factoried_schedules": [
+        {
+            "schedule_start": 100,
+            "schedule_end": 200
+        }
+    ]
+}
+```
+
 ### Polymorphic deserialization
 
 Say you have 2 classes that extend a base class. You might receive those as part of a collection and don't know ahead of time if you'll be dealing with
@@ -471,6 +521,10 @@ $stats = new Stats;
 $stats->count = new BigInt("123456789876543234567898765432345678976543234567876543212345678765432");
 $stats->toJson(); // {"count":"123456789876543234567898765432345678976543234567876543212345678765432"}
 ```
+
+### Collection Classes
+
+If you wish to use pjson with collection classes
 
 ## Use with PHPStan
 Using this library, you may have properties that don't appear to be read from or written to anywhere in your code, but

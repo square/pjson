@@ -10,6 +10,7 @@ use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\Collector;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Privateer;
 use Square\Pjson\Tests\Definitions\Schedule;
@@ -242,5 +243,45 @@ final class SerializationTest extends TestCase
         // MenuList doesn't store the entire structure. Only the name of the first menu
         // it can however still output all the data it has back into its original shape
         $this->assertEquals('{"menus":[{"name":"main-menu"}]}', $dl->toJson());
+    }
+
+    public function testCollections()
+    {
+        $json = '{
+            "schedules": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                {
+                    "schedule_start": 10,
+                    "schedule_end": 20
+                }
+            ],
+            "static_factoried_schedules": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                {
+                    "schedule_start": 10,
+                    "schedule_end": 20
+                }
+            ],
+            "factoried_schedules": [
+                {
+                    "schedule_start": 1,
+                    "schedule_end": 2
+                },
+                {
+                    "schedule_start": 10,
+                    "schedule_end": 20
+                }
+            ]
+        }';
+
+        $data = Collector::fromJsonString($json);
+
+        $this->assertEquals(json_encode(json_decode($json)), $data->toJson());
     }
 }
