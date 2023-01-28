@@ -486,6 +486,22 @@ $w->size = Size::BIG;
 $w->toJson(); // {"status": "big"}
 ```
 
+### Required properties
+You can mark a property as required for deserialization:
+```php
+readonly class Token
+{
+    use JsonSerialize;
+
+    #[Json(required: true)]
+    public string $key;
+}
+
+$token = Token::fromJsonString('{"key":"data"}'); // successful
+
+Token::fromJsonString('{"other":"has no key"}'); // throws Exception
+```
+
 ### Scalar <=> Class
 In some cases, you might want a scalar value to become a PHP object once deserialized and vice-versa. For example, a `BigInt` class
 could hold an int as a string and represent it as a string when serialized to JSON:

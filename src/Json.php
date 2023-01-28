@@ -18,11 +18,14 @@ class Json
 
     protected string $collection_factory_method;
 
+    protected bool $required;
+
     public function __construct(
         string|array $path = '',
         string $type = '',
         bool $omit_empty = false,
-        string $collection_factory_method = ''
+        string $collection_factory_method = '',
+        bool $required = false,
     ) {
         if ($path !== '') {
             if (is_string($path)) {
@@ -37,6 +40,7 @@ class Json
 
         $this->omit_empty = $omit_empty;
         $this->collection_factory_method = $collection_factory_method;
+        $this->required = $required;
     }
 
     /**
@@ -60,7 +64,7 @@ class Json
     {
         foreach ($this->path as $pathBit) {
             if (!array_key_exists($pathBit, $data)) {
-                return ;
+                return $this->handleMissingValue();
             }
             $data = $data[$pathBit];
         }
@@ -110,6 +114,17 @@ class Json
         }
 
         return $data;
+    }
+
+    /**
+     * What happens when deserializing a property that isn't set.
+     */
+    protected function handleMissingValue()
+    {
+        if ($this->required) {
+            throw new \Exception('missing required value: '.json_encode($this->path));
+        }
+        return null;
     }
 
     protected function isCollection(string $className)
