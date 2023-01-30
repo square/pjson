@@ -79,7 +79,7 @@ class Json
             return $data;
         }
         if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
-            return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
+            return is_null($data) ? $data : array_map(fn ($d) => $this->type::fromJsonData($d), $data);
         }
 
         // Deal with collections / Traversable classes

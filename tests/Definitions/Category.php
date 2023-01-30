@@ -28,6 +28,9 @@ class Category
     #[Json('upcomming_schedules', type: Schedule::class)]
     protected array $schedules;
 
+    #[Json('nullable_schedules', type: Schedule::class)]
+    protected ?array $nullableSchedules;
+
     #[Json('counts', omit_empty: true)]
     public array $counts = [];
 
@@ -48,5 +51,10 @@ class Category
     public function setUpcoming(array $up)
     {
         $this->schedules = $up;
+    }
+
+    public function setNullable()
+    {
+        $this->nullableSchedules = null;
     }
 }

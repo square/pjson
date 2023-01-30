@@ -62,6 +62,7 @@ final class DeSerializationTest extends TestCase
             "data_name" => null,
             "schedule" => null,
             "schedules" => null,
+            "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => null,
             "untypedSchedule" => null,
@@ -87,6 +88,7 @@ final class DeSerializationTest extends TestCase
             "name" => "Clothes",
             "schedule" => null,
             "schedules" => null,
+            "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => null,
             "untypedSchedule" => null,
@@ -127,6 +129,7 @@ final class DeSerializationTest extends TestCase
               "end" => 20,
             ],
             "schedules" => null,
+            "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => null,
             "untypedSchedule" => null,
@@ -154,7 +157,8 @@ final class DeSerializationTest extends TestCase
                     "schedule_start": 30,
                     "schedule_end": 40
                 }
-            ]
+            ],
+            "nullable_schedules": null
         }');
         $this->assertEquals([
             '@class' => Category::class,
@@ -178,6 +182,7 @@ final class DeSerializationTest extends TestCase
                 "end" => 40,
               ],
             ],
+            "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => null,
             "untypedSchedule" => null,
@@ -205,6 +210,7 @@ final class DeSerializationTest extends TestCase
             "data_name" => null,
             "schedule" => null,
             "schedules" => null,
+            "nullableSchedules" => null,
             "counts" => [
               0 => 1,
               1 => "abc",
@@ -233,6 +239,7 @@ final class DeSerializationTest extends TestCase
             "data_name" => null,
             "schedule" => null,
             "schedules" => null,
+            "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => "bob",
             "untypedSchedule" => null,
@@ -261,6 +268,7 @@ final class DeSerializationTest extends TestCase
             "data_name" => null,
             "schedule" => null,
             "schedules" => null,
+            "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => "bob",
             "untypedSchedule" => [
