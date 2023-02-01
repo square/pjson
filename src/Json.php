@@ -4,6 +4,7 @@ namespace Square\Pjson;
 use Attribute;
 use ReflectionNamedType;
 use ReflectionProperty;
+use Square\Pjson\Exceptions\MissingRequiredPropertyException;
 use Square\Pjson\Internal\RClass;
 use Traversable;
 
@@ -64,7 +65,7 @@ class Json
     {
         foreach ($this->path as $pathBit) {
             if (!array_key_exists($pathBit, $data)) {
-                return $this->handleMissingValue();
+                return $this->handleMissingValue($data);
             }
             $data = $data[$pathBit];
         }
@@ -119,10 +120,10 @@ class Json
     /**
      * What happens when deserializing a property that isn't set.
      */
-    protected function handleMissingValue()
+    protected function handleMissingValue($data)
     {
         if ($this->required) {
-            throw new \Exception('missing required value: '.json_encode($this->path));
+            throw new MissingRequiredPropertyException($this->path, json_encode($data));
         }
         return null;
     }
