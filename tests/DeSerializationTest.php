@@ -3,6 +3,7 @@ namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Square\Pjson\Exceptions\MissingRequiredPropertyException;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
@@ -562,7 +563,7 @@ final class DeSerializationTest extends TestCase
     {
         $json = '{}';
 
-        $this->expectException(\Exception::class);
+        $this->expectException(MissingRequiredPropertyException::class);
 
         Token::fromJsonString($json);
     }
