@@ -156,16 +156,25 @@ class Json
     /**
      * Appends the given value to an array of data on the path to serializing to a JSON string
      */
-    public function appendValue(array &$data, $value)
+    public function appendValue(array $data, $value): array
     {
         if ($this->omit_empty && $this->isEmpty($value)) {
-            return;
+            return $data;
         }
         $max = count($this->path)-1;
+        if ($max < 0) {
+            return array_merge_recursive($data, $this->jsonValue($value));
+        }
+
         $d = &$data;
         foreach ($this->path as $i => $pathBit) {
             if (array_key_exists($pathBit, $d) && $i === $max) {
-                throw new \Exception('invalid path: '.json_encode($this->path));
+                if (is_array($d[$pathBit])) {
+                    $d[$pathBit] = array_merge_recursive($d[$pathBit], $this->jsonValue($value));
+                    break;
+                } else {
+                    throw new \Exception('invalid path: '.json_encode($this->path));
+                }
             }
 
             if (!array_key_exists($pathBit, $d) && $i < $max) {
@@ -187,6 +196,7 @@ class Json
                 }
             }
         }
+        return $data;
     }
 
     protected function jsonValue($value)

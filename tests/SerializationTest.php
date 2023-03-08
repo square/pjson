@@ -2,8 +2,8 @@
 namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Square\Pjson\JsonSerialize;
 use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
@@ -11,9 +11,15 @@ use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Collector;
+use Square\Pjson\Tests\Definitions\Container;
+use Square\Pjson\Tests\Definitions\Deep;
 use Square\Pjson\Tests\Definitions\MenuList;
+use Square\Pjson\Tests\Definitions\MergeOne;
+use Square\Pjson\Tests\Definitions\MergeTwo;
 use Square\Pjson\Tests\Definitions\Privateer;
+use Square\Pjson\Tests\Definitions\Recursive;
 use Square\Pjson\Tests\Definitions\Schedule;
+use Square\Pjson\Tests\Definitions\Shared;
 use Square\Pjson\Tests\Definitions\Stats;
 use Square\Pjson\Tests\Definitions\Traitor;
 use Square\Pjson\Tests\Definitions\Weekend;
@@ -285,5 +291,61 @@ final class SerializationTest extends TestCase
         $data = Collector::fromJsonString($json);
 
         $this->assertEquals(json_encode(json_decode($json)), $data->toJson());
+    }
+
+    public function testEmptyPathProperty()
+    {
+        $container = new Container(
+            new Shared(7, 'content'),
+            'test'
+        );
+
+        $json = $container->toJson();
+
+        $this->assertJsonStringEqualsJsonString('{
+            "data": 7,
+            "additional": "test",
+            "other": "content"
+        }', $json);
+    }
+
+    public function testDeepEmptyPathMerge()
+    {
+        $deep = new Deep(
+            3.0,
+            new Container(
+                new Shared(7, 'content'),
+                'test'
+            )
+        );
+
+        $json = $deep->toJson();
+
+        $this->assertJsonStringEqualsJsonString('{
+            "depth": 3.0,
+            "data": 7,
+            "additional": "test",
+            "other": "content"
+        }', $json);
+    }
+
+    public function testEmptyPathRecursiveMerge()
+    {
+        $recursive = new Recursive(
+            new MergeOne('first'),
+            new MergeTwo('second'),
+            new Shared(5, 'other')
+        );
+
+        $json = $recursive->toJson();
+
+        $this->assertJsonStringEqualsJsonString('{
+            "sub": {
+                "one": "first",
+                "two": "second",
+                "data": 5,
+                "other": "other"
+            }
+        }', $json);
     }
 }

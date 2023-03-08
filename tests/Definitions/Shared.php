@@ -1,0 +1,18 @@
+<?php
+declare(strict_types=1);
+
+namespace Square\Pjson\Tests\Definitions;
+
+use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
+
+class Shared
+{
+    use JsonSerialize;
+
+    public function __construct(
+        #[Json] public int $data,
+        #[Json(path: 'other')] public string $text,
+    ) {
+    }
+}
