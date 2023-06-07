@@ -10,6 +10,7 @@ use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\Child;
 use Square\Pjson\Tests\Definitions\Collector;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Privateer;
@@ -283,6 +284,16 @@ final class SerializationTest extends TestCase
         }';
 
         $data = Collector::fromJsonString($json);
+
+        $this->assertEquals(json_encode(json_decode($json)), $data->toJson());
+    }
+
+    public function testMissingParent()
+    {
+        // Ensure that while the `parent` object is null, we can still serialize the parent.id property which is
+        // nested under `parent`.
+        $data = new Child();
+        $json = '{"identifier":null,"parent":{"id":null}}';
 
         $this->assertEquals(json_encode(json_decode($json)), $data->toJson());
     }
