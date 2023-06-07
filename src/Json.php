@@ -168,7 +168,7 @@ class Json
                 throw new \Exception('invalid path: '.json_encode($this->path));
             }
 
-            if (!array_key_exists($pathBit, $d) && $i < $max) {
+            if ((!array_key_exists($pathBit, $d) || is_null($d[$pathBit])) && $i < $max) {
                 $d[$pathBit] = [];
             }
 
