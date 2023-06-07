@@ -290,6 +290,8 @@ final class SerializationTest extends TestCase
 
     public function testMissingParent()
     {
+        // Ensure that while the `parent` object is null, we can still serialize the parent.id property which is
+        // nested under `parent`.
         $data = new Child();
         $json = '{"identifier":null,"parent":{"id":null}}';
 
