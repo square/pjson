@@ -27,6 +27,20 @@ final class SerializationTest extends TestCase
         $this->assertEquals('{"identifier":"myid","category_name":"Clothes","data":{"name":null}}', $c->toJson());
     }
 
+    public function testNullableProperty()
+    {
+        $c = new Category;
+        $c->nullableSchedule = null;
+        $this->assertEquals($this->comparableJson('{
+            "identifier": "myid",
+            "category_name": "Clothes",
+            "data": {
+                "name": null
+            },
+            "nullable_schedule": null
+        }'), $c->toJson());
+    }
+
     public function testSerializeAcceptsJsonFlags()
     {
         $c = new Category;
@@ -78,7 +92,7 @@ final class SerializationTest extends TestCase
     {
         $c = new Category;
         $c->setSchedule(new Schedule(1, 20));
-        $this->assertEquals(json_encode(json_decode('{
+        $this->assertEquals($this->comparableJson('{
             "identifier": "myid",
             "category_name": "Clothes",
             "data": {
@@ -88,7 +102,7 @@ final class SerializationTest extends TestCase
                 "schedule_start": 1,
                 "schedule_end": 20
             }
-        }')), $c->toJson());
+        }'), $c->toJson());
     }
 
     public function testSerializesObjectArrays()
@@ -97,7 +111,7 @@ final class SerializationTest extends TestCase
         $c->setSchedule(new Schedule(1, 20));
         $c->setUpcoming([new Schedule(1, 20), new Schedule(30, 40)]);
         $c->setNullable();
-        $this->assertEquals(json_encode(json_decode('{
+        $this->assertEquals($this->comparableJson('{
             "identifier": "myid",
             "category_name": "Clothes",
             "data": {
@@ -118,14 +132,14 @@ final class SerializationTest extends TestCase
                 }
             ],
             "nullable_schedules": null
-        }')), $c->toJson());
+        }'), $c->toJson());
     }
 
     public function testSerializesScalarArrays()
     {
         $c = new Category;
         $c->counts = [1, 'abc', 678];
-        $this->assertEquals(json_encode(json_decode('{
+        $this->assertEquals($this->comparableJson('{
             "identifier": "myid",
             "category_name": "Clothes",
             "data": {
@@ -136,35 +150,35 @@ final class SerializationTest extends TestCase
                 "abc",
                 678
             ]
-        }')), $c->toJson());
+        }'), $c->toJson());
     }
 
     public function testSerializesWithNoName()
     {
         $c = new Category;
         $c->unnamed = 'bob';
-        $this->assertEquals(json_encode(json_decode('{
+        $this->assertEquals($this->comparableJson('{
             "identifier": "myid",
             "category_name": "Clothes",
             "data": {
                 "name": null
             },
             "unnamed": "bob"
-        }')), $c->toJson());
+        }'), $c->toJson());
     }
 
     public function testPrivateProps()
     {
         $p = new Privateer;
-        $this->assertEquals(json_encode(json_decode('{
+        $this->assertEquals($this->comparableJson('{
             "name": "Jenna"
-        }')), $p->toJson());
+        }'), $p->toJson());
     }
 
     public function testHashMaps()
     {
         $w = new Weekend;
-        $this->assertEquals(json_encode(json_decode('{
+        $this->assertEquals($this->comparableJson('{
             "weekend": {
                 "sat": {
                     "schedule_start": 1,
@@ -175,13 +189,13 @@ final class SerializationTest extends TestCase
                     "schedule_end": 4
                 }
             }
-        }')), $w->toJson());
+        }'), $w->toJson());
     }
 
     public function testTraitProps()
     {
         $t = new Traitor;
-        $this->assertEquals(json_encode(json_decode('{"secretly_working_for": "MI6"}')), $t->toJson());
+        $this->assertEquals($this->comparableJson('{"secretly_working_for": "MI6"}'), $t->toJson());
     }
 
     public function testPolymorphicClass()
@@ -206,7 +220,7 @@ final class SerializationTest extends TestCase
         ];
 
         $jl = Schedule::toJsonList($l);
-        $this->assertEquals(json_encode(json_decode('[
+        $this->assertEquals($this->comparableJson('[
             {
                 "schedule_start": 1,
                 "schedule_end": 2
@@ -219,7 +233,7 @@ final class SerializationTest extends TestCase
                 "schedule_start": 111,
                 "schedule_end": 222
             }
-        ]')), $jl);
+        ]'), $jl);
     }
 
     public function testClassToScalar()
@@ -285,7 +299,7 @@ final class SerializationTest extends TestCase
 
         $data = Collector::fromJsonString($json);
 
-        $this->assertEquals(json_encode(json_decode($json)), $data->toJson());
+        $this->assertEquals($this->comparableJson($json), $data->toJson());
     }
 
     public function testMissingParent()
@@ -295,6 +309,11 @@ final class SerializationTest extends TestCase
         $data = new Child();
         $json = '{"identifier":null,"parent":{"id":null}}';
 
-        $this->assertEquals(json_encode(json_decode($json)), $data->toJson());
+        $this->assertEquals($this->comparableJson($json), $data->toJson());
+    }
+
+    protected function comparableJson(string $json) : string
+    {
+        return json_encode(json_decode($json));
     }
 }

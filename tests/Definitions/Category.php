@@ -22,6 +22,9 @@ class Category
     #[Json('next_schedule')]
     protected Schedule $schedule;
 
+    #[Json('nullable_schedule')]
+    public ?Schedule $nullableSchedule;
+
     #[Json('untyped_schedule', type: Schedule::class, omit_empty: true)]
     public $untypedSchedule;
 

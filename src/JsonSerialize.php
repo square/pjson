@@ -4,7 +4,6 @@ namespace Square\Pjson;
 
 use ReflectionAttribute;
 use Square\Pjson\Internal\RClass;
-use stdClass;
 use const JSON_THROW_ON_ERROR;
 
 trait JsonSerialize
