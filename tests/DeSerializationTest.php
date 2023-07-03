@@ -63,12 +63,39 @@ final class DeSerializationTest extends TestCase
             "name" => "Clothes",
             "data_name" => null,
             "schedule" => null,
+            "nullableSchedule" => null,
             "schedules" => null,
             "nullableSchedules" => null,
             "counts" => [],
             "unnamed" => null,
             "untypedSchedule" => null,
           ], $this->export($c));
+    }
+
+    public function testNullableProperty()
+    {
+        $c = Category::fromJsonString('{
+            "identifier": "myid",
+            "category_name": "Clothes",
+            "data": {
+                "name": null
+            },
+            "nullable_schedule": null
+        }');
+        $this->assertEquals([
+            '@class' => Category::class,
+            "id" => "myid",
+            "name" => "Clothes",
+            "data_name" => null,
+            "schedule" => null,
+            "nullableSchedule" => null,
+            "schedules" => null,
+            "nullableSchedules" => null,
+            "counts" => [],
+            "unnamed" => null,
+            "untypedSchedule" => null,
+          ], $this->export($c));
+        $this->assertNull($c->nullableSchedule);
     }
 
     public function testThrowsOnError()
@@ -89,6 +116,7 @@ final class DeSerializationTest extends TestCase
             "id" => "myid",
             "name" => "Clothes",
             "schedule" => null,
+            "nullableSchedule" => null,
             "schedules" => null,
             "nullableSchedules" => null,
             "counts" => [],
@@ -130,6 +158,7 @@ final class DeSerializationTest extends TestCase
               "start" => 1,
               "end" => 20,
             ],
+            "nullableSchedule" => null,
             "schedules" => null,
             "nullableSchedules" => null,
             "counts" => [],
@@ -172,6 +201,7 @@ final class DeSerializationTest extends TestCase
               "start" => 1,
               "end" => 20,
             ],
+            "nullableSchedule" => null,
             "schedules" => [
               0 => [
                 '@class' => Schedule::class,
@@ -211,6 +241,7 @@ final class DeSerializationTest extends TestCase
             "name" => "Clothes",
             "data_name" => null,
             "schedule" => null,
+            "nullableSchedule" => null,
             "schedules" => null,
             "nullableSchedules" => null,
             "counts" => [
@@ -240,6 +271,7 @@ final class DeSerializationTest extends TestCase
             "name" => "Clothes",
             "data_name" => null,
             "schedule" => null,
+            "nullableSchedule" => null,
             "schedules" => null,
             "nullableSchedules" => null,
             "counts" => [],
@@ -269,6 +301,7 @@ final class DeSerializationTest extends TestCase
             "name" => "Clothes",
             "data_name" => null,
             "schedule" => null,
+            "nullableSchedule" => null,
             "schedules" => null,
             "nullableSchedules" => null,
             "counts" => [],

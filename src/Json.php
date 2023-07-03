@@ -61,13 +61,17 @@ class Json
     /**
      * Builds the PHP value from the json data and a type if available
      */
-    public function retrieveValue(array $data, ?ReflectionNamedType $type = null)
+    public function retrieveValue(?array $data, ?ReflectionNamedType $type = null)
     {
         foreach ($this->path as $pathBit) {
             if (!array_key_exists($pathBit, $data)) {
                 return $this->handleMissingValue($data);
             }
             $data = $data[$pathBit];
+        }
+
+        if (is_null($data) && $type && $type->allowsNull()) {
+            return null;
         }
 
         if ($type === null) {
