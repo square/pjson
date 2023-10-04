@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Square\Pjson\Tests\Definitions\DTO;
 use Square\Pjson\Tests\Definitions\Size;
 use Square\Pjson\Tests\Definitions\Status;
+use Square\Pjson\Tests\Definitions\StatusList;
 use Square\Pjson\Tests\Definitions\Widget;
 
 final class Php81SerializationTest extends TestCase
@@ -34,6 +35,15 @@ final class Php81SerializationTest extends TestCase
         $this->assertEquals(json_encode(json_decode('{
             "status": "ON",
             "size": "big"
+        }')), $w->toJson());
+    }
+
+    public function testBackedEnumArray()
+    {
+        $w = new StatusList();
+        $w->statusList = [Status::ON, Status::OFF, Status::ON];
+        $this->assertEquals(json_encode(json_decode('{
+            "status_list": ["ON", "OFF", "ON"]
         }')), $w->toJson());
     }
 }
