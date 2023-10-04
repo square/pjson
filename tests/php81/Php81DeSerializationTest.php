@@ -6,6 +6,7 @@ use ReflectionClass;
 use Square\Pjson\Tests\Definitions\DTO;
 use Square\Pjson\Tests\Definitions\Size;
 use Square\Pjson\Tests\Definitions\Status;
+use Square\Pjson\Tests\Definitions\StatusList;
 use Square\Pjson\Tests\Definitions\Widget;
 
 final class Php81DeSerializationTest extends TestCase
@@ -107,6 +108,33 @@ final class Php81DeSerializationTest extends TestCase
             "size" => [
                 '@class' => Size::class,
                 'name' => 'BIG',
+            ],
+        ], $this->export($w));
+    }
+
+    public function testBackedEnumArray()
+    {
+        $w = StatusList::fromJsonString('{
+            "status_list": ["ON", "OFF", "ON"]
+        }');
+        $this->assertEquals([
+            "@class" => StatusList::class,
+            "statusList" => [
+                0 => [
+                    "@class" => Status::class,
+                    "name" => "ON",
+                    "value" => "ON",
+                ],
+                1 => [
+                    "@class" => Status::class,
+                    "name" => "OFF",
+                    "value" => "OFF",
+                ],
+                2 => [
+                    "@class" => Status::class,
+                    "name" => "ON",
+                    "value" => "ON",
+                ]
             ],
         ], $this->export($w));
     }

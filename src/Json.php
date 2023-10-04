@@ -88,7 +88,15 @@ class Json
             return $data;
         }
         if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
-            return is_null($data) ? $data : array_map(fn ($d) => $this->type::fromJsonData($d), $data);
+            if (is_null($data)) {
+                return $data;
+            }
+
+            if (RClass::make($this->type)->isBackedEnum()) {
+                return array_map(fn ($d) => $this->type::from($d), $data);
+            }
+
+            return array_map(fn ($d) => $this->type::fromJsonData($d), $data);
         }
 
         // Deal with collections / Traversable classes

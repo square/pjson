@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Square\Pjson\Internal;
 
 use BackedEnum;
 use ReflectionClass;
 use Square\Pjson\FromJsonData;
-use UnitEnum;
 use Square\Pjson\JsonSerialize;
 use Square\Pjson\ToJsonData;
+use UnitEnum;
 
 class RClass
 {
@@ -27,13 +29,13 @@ class RClass
         }
     }
 
-    public static function make($class) : RClass
+    public static function make($class): RClass
     {
         if (is_object($class)) {
             $class = get_class($class);
         }
 
-        if (!array_key_exists($class, self::$cache)) {
+        if (! array_key_exists($class, self::$cache)) {
             self::$cache[$class] = new self($class);
         }
 
@@ -45,37 +47,35 @@ class RClass
         return $this->props;
     }
 
-    public function source() : ReflectionClass
+    public function source(): ReflectionClass
     {
         return $this->rc;
     }
 
-    public function isBackedEnum() : bool
+    public function isBackedEnum(): bool
     {
-        return $this->rc->implementsInterface(BackedEnum::class);
+        return interface_exists(BackedEnum::class) && $this->rc->implementsInterface(BackedEnum::class);
     }
 
-    public function isEnum() : bool
+    public function isEnum(): bool
     {
         return $this->rc->implementsInterface(UnitEnum::class);
     }
 
-    public function isSimpleEnum() : bool
+    public function isSimpleEnum(): bool
     {
-        return $this->isEnum() && !$this->isBackedEnum();
+        return $this->isEnum() && ! $this->isBackedEnum();
     }
 
-    public function isMethodStatic(string $methodName) : bool
+    public function isMethodStatic(string $methodName): bool
     {
         return $this->rc->getMethod($methodName)->isStatic();
     }
 
     /**
      * True if the type either implements the FromJsonData interface or directly uses the JsonSerialize trait
-     *
-     * @return boolean
      */
-    public function readsFromJson() : bool
+    public function readsFromJson(): bool
     {
         $traits = class_uses($this->rc->getName());
 
@@ -84,10 +84,8 @@ class RClass
 
     /**
      * True if the type either implements the ToJsonData interface or directly uses the JsonSerialize trait
-     *
-     * @return boolean
      */
-    public function writesToJson() : bool
+    public function writesToJson(): bool
     {
         $traits = class_uses($this->rc->getName());
 
