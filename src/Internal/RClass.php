@@ -54,7 +54,7 @@ class RClass
 
     public function isBackedEnum(): bool
     {
-        return class_exists(BackedEnum::class) && $this->rc->implementsInterface(BackedEnum::class);
+        return interface_exists(BackedEnum::class) && $this->rc->implementsInterface(BackedEnum::class);
     }
 
     public function isEnum(): bool
