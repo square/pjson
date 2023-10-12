@@ -12,11 +12,17 @@ use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
+use Square\Pjson\Tests\Definitions\Container;
+use Square\Pjson\Tests\Definitions\Deep;
 use Square\Pjson\Tests\Definitions\MenuList;
-use Square\Pjson\Tests\Definitions\Schedule;
+use Square\Pjson\Tests\Definitions\MergeOne;
+use Square\Pjson\Tests\Definitions\MergeTwo;
 use Square\Pjson\Tests\Definitions\Privateer;
-use Square\Pjson\Tests\Definitions\Token;
+use Square\Pjson\Tests\Definitions\Recursive;
+use Square\Pjson\Tests\Definitions\Schedule;
+use Square\Pjson\Tests\Definitions\Shared;
 use Square\Pjson\Tests\Definitions\Stats;
+use Square\Pjson\Tests\Definitions\Token;
 use Square\Pjson\Tests\Definitions\Traitor;
 use Square\Pjson\Tests\Definitions\Weekend;
 
@@ -599,5 +605,83 @@ final class DeSerializationTest extends TestCase
         $this->expectException(MissingRequiredPropertyException::class);
 
         Token::fromJsonString($json);
+    }
+
+    public function testEmptyPathProperty()
+    {
+        $json = '{
+            "data": 7,
+            "additional": "test",
+            "other": "content"
+        }';
+
+        $container = Container::fromJsonString($json);
+
+        $this->assertEquals([
+            '@class' => Container::class,
+            'shared' => [
+                '@class' => Shared::class,
+                'data' => 7,
+                'text' => 'content',
+            ],
+            'additional' => 'test',
+        ], $this->export($container));
+    }
+
+    public function testDeepEmptyPathMerge()
+    {
+        $json = '{
+            "depth": 3.0,
+            "data": 7,
+            "additional": "test",
+            "other": "content"
+        }';
+
+        $container = Deep::fromJsonString($json);
+
+        $this->assertEquals([
+            '@class' => Deep::class,
+            'depth' => 3.0,
+            'container' => [
+                '@class' => Container::class,
+                'shared' => [
+                    '@class' => Shared::class,
+                    'data' => 7,
+                    'text' => 'content',
+                ],
+                'additional' => 'test',
+            ],
+        ], $this->export($container));
+    }
+
+    public function testEmptyPathRecursiveMerge()
+    {
+        $json = '{
+            "sub": {
+                "data": 5,
+                "one": "first",
+                "other": "other",
+                "two": "second"
+            }
+        }';
+
+        $recursive = Recursive::fromJsonString($json);
+
+        $this->assertEquals([
+            '@class' => Recursive::class,
+            'one' => [
+                '@class' => MergeOne::class,
+                'one' => 'first'
+            ],
+            'two' => [
+                '@class' => MergeTwo::class,
+                'two' => 'second'
+            ],
+            'sub' => [
+                '@class' => Shared::class,
+                'data' => 5,
+                'text' => 'other',
+            ],
+        ], $this->export($recursive));
     }
 }

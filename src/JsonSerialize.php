@@ -26,7 +26,9 @@ trait JsonSerialize
             }
             $a = $attrs[0];
             if ($prop->isInitialized($this)) {
-                $a->newInstance()->forProperty($prop)->appendValue($d, $prop->getValue($this));
+                /** @var Json $jsonAttribute */
+                $jsonAttribute = $a->newInstance()->forProperty($prop);
+                $d = $jsonAttribute->appendValue($d, $prop->getValue($this));
             }
         }
 

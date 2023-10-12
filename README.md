@@ -422,6 +422,36 @@ Schedule::fromJsonString('{
 }', path: ['data', 'main']);
 ```
 
+### Merging data
+
+Sometimes it is useful to merge some data into the same JSON object while still keeping them as separate PHP objects:
+
+```php
+class Decorator
+{
+    use JsonSerialize;
+    
+    #[Json(path: [])]
+    public Data $decoratedData;
+
+    #[Json]
+    public string $additional;
+}
+
+class Data
+{
+    use JsonSerialize;
+    
+    #[Json]
+    public string $value;
+}
+
+$data = new Decorator(new Data('myValue'), 'andMore');
+$data->toJson(); // {"value": "myValue", "additional": "andMore"}
+```
+
+This works for both serializing and deserializing.
+
 ### Enums
 
 Backed enums are supported out of the box in PHP 8.1
