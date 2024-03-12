@@ -619,7 +619,5 @@ final class DeSerializationTest extends TestCase
 
         $this->assertTrue(is_string($caString->value));
         $this->assertEquals('website-name', $caString->value);
-
-
     }
 }
