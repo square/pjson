@@ -12,6 +12,7 @@ use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
+use Square\Pjson\Tests\Definitions\CustomAttribute;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
@@ -599,5 +600,26 @@ final class DeSerializationTest extends TestCase
         $this->expectException(MissingRequiredPropertyException::class);
 
         Token::fromJsonString($json);
+    }
+
+    public function testUnionTypes()
+    {
+        $caInt = CustomAttribute::fromJsonData([
+            'key' => 'unique-key',
+            'value' => 5
+        ]);
+
+        $caString = CustomAttribute::fromJsonData([
+            'key' => 'unique-key',
+            'value' => 'website-name'
+        ]);
+
+        $this->assertTrue(is_int($caInt->value));
+        $this->assertEquals(5, $caInt->value);
+
+        $this->assertTrue(is_string($caString->value));
+        $this->assertEquals('website-name', $caString->value);
+
+
     }
 }
