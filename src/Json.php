@@ -2,7 +2,8 @@
 namespace Square\Pjson;
 
 use Attribute;
-use ReflectionNamedType;
+use ReflectionType;
+use ReflectionUnionType;
 use ReflectionProperty;
 use Square\Pjson\Exceptions\MissingRequiredPropertyException;
 use Square\Pjson\Internal\RClass;
@@ -61,8 +62,15 @@ class Json
     /**
      * Builds the PHP value from the json data and a type if available
      */
-    public function retrieveValue(?array $data, ?ReflectionNamedType $type = null)
+    public function retrieveValue(?array $data, ?ReflectionType $type = null)
     {
+        if ($type instanceof ReflectionUnionType) {
+            // we currently use $type just to check if null is allowed.
+            // php union types must share nullable, it cant be set per type.
+            // so we'll take the first one.
+            $type = $type->getTypes()[0];
+        }
+
         foreach ($this->path as $pathBit) {
             if (!array_key_exists($pathBit, $data)) {
                 return $this->handleMissingValue($data);
