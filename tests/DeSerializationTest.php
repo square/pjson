@@ -14,6 +14,7 @@ use Square\Pjson\Tests\Definitions\Child;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
 use Square\Pjson\Tests\Definitions\UnionUsingArray;
+use Square\Pjson\Tests\Definitions\UnionUsingArrayAndObject;
 use Square\Pjson\Tests\Definitions\UnionUsingCustomObject;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Schedule;
@@ -654,5 +655,17 @@ final class DeSerializationTest extends TestCase
             ],
         ]);
         $this->assertIsArray($ca->value);
+    }
+
+    public function testUnionTypesUsingArrayAndCustomObject()
+    {
+        $this->expectException(\RuntimeException::class);
+        UnionUsingArrayAndObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
     }
 }
