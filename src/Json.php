@@ -89,9 +89,7 @@ class Json
                     $message
                 );
             }
-            if (array_key_exists('array', $typesByType) &&
-                count($customObjectTypes) > 0
-            ) {
+            if (array_key_exists('array', $typesByType) && count($customObjectTypes) > 0) {
                 throw new \RuntimeException(
                     'Using array with custom objects as a union type is not supported.'
                 );
