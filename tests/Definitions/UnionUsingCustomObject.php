@@ -5,7 +5,7 @@ namespace Square\Pjson\Tests\Definitions;
 use Square\Pjson\Json;
 use Square\Pjson\JsonSerialize;
 
-class CustomAttribute
+class UnionUsingCustomObject
 {
     use JsonSerialize;
 
@@ -13,5 +13,5 @@ class CustomAttribute
     public string $key;
 
     #[Json]
-    public int|string $value;
+    public int|string|null|UnionUsingCustomObject $value;
 }

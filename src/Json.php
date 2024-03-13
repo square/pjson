@@ -72,16 +72,43 @@ class Json
         }
 
         if ($type instanceof ReflectionUnionType) {
-            $typesByType = $type->getTypes();
-            foreach ($type->getTypes() as $type) {
-                $typesByType[$type->getName()] = $type;
+            $typesByType = [];
+            $customObjectTypes = [];
+            foreach ($type->getTypes() as $unionType) {
+                if (class_exists($unionType->getName())) {
+                    $customObjectTypes[] = $unionType;
+                } else {
+                    $typesByType[$unionType->getName()] = $unionType;
+                }
             }
-            $type = match (gettype($data)) {
-                'string' => $typesByType['string'],
-                'boolean' => $typesByType['bool'],
-                'integer' => $typesByType['int'],
-                'array' => $typesByType['array'],
-            };
+
+            if (count($customObjectTypes) > 1) {
+                $message = 'Using more than one custom object within a union type is not supported.';
+                $message .= ' Consider using different properties on your object instead.';
+                throw new \RuntimeException(
+                    $message
+                );
+            }
+            if (array_key_exists('array', $typesByType) &&
+                count($customObjectTypes) > 0
+            ) {
+                throw new \RuntimeException(
+                    'Using array with custom objects as a union type is not supported.'
+                );
+            }
+            $dataType = strtolower(gettype($data));
+
+            if ($dataType === 'array' && !empty($customObjectTypes)) {
+                $type = $customObjectTypes[0];
+            } else {
+                $type = match (strtolower(gettype($data))) {
+                    'string' => $typesByType['string'],
+                    'boolean' => $typesByType['bool'],
+                    'integer' => $typesByType['int'],
+                    'array' => $typesByType['array'],
+                    'null' => $typesByType['null'],
+                };
+            }
         }
 
 

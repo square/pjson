@@ -10,9 +10,11 @@ use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\Child;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
-use Square\Pjson\Tests\Definitions\CustomAttribute;
+use Square\Pjson\Tests\Definitions\UnionUsingArray;
+use Square\Pjson\Tests\Definitions\UnionUsingCustomObject;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
@@ -604,12 +606,12 @@ final class DeSerializationTest extends TestCase
 
     public function testUnionTypes()
     {
-        $caInt = CustomAttribute::fromJsonData([
+        $caInt = UnionUsingCustomObject::fromJsonData([
             'key' => 'unique-key',
             'value' => 5
         ]);
 
-        $caString = CustomAttribute::fromJsonData([
+        $caString = UnionUsingCustomObject::fromJsonData([
             'key' => 'unique-key',
             'value' => 'website-name'
         ]);
@@ -619,5 +621,38 @@ final class DeSerializationTest extends TestCase
 
         $this->assertTrue(is_string($caString->value));
         $this->assertEquals('website-name', $caString->value);
+    }
+
+    public function testUnionTypesUsingNull()
+    {
+        $ca = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => null,
+        ]);
+        $this->assertNull($ca->value);
+    }
+
+    public function testUnionTypesUsingObject()
+    {
+        $ca = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
+        $this->assertInstanceOf(UnionUsingCustomObject::class, $ca->value);
+    }
+
+    public function testUnionTypesUsingArray()
+    {
+        $ca = UnionUsingArray::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
+        $this->assertIsArray($ca->value);
     }
 }
