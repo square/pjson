@@ -4,6 +4,7 @@ namespace Square\Pjson;
 use Attribute;
 use ReflectionNamedType;
 use ReflectionProperty;
+use ReflectionUnionType;
 use Square\Pjson\Exceptions\MissingRequiredPropertyException;
 use Square\Pjson\Internal\RClass;
 use Traversable;
@@ -61,7 +62,7 @@ class Json
     /**
      * Builds the PHP value from the json data and a type if available
      */
-    public function retrieveValue(?array $data, ?ReflectionNamedType $type = null)
+    public function retrieveValue(?array $data, ReflectionNamedType|ReflectionUnionType|null $type = null)
     {
         foreach ($this->path as $pathBit) {
             if (!array_key_exists($pathBit, $data)) {
@@ -69,6 +70,45 @@ class Json
             }
             $data = $data[$pathBit];
         }
+
+        if ($type instanceof ReflectionUnionType) {
+            $typesByType = [];
+            $customObjectTypes = [];
+            foreach ($type->getTypes() as $unionType) {
+                if (class_exists($unionType->getName())) {
+                    $customObjectTypes[] = $unionType;
+                } else {
+                    $typesByType[$unionType->getName()] = $unionType;
+                }
+            }
+
+            if (count($customObjectTypes) > 1) {
+                $message = 'Using more than one custom object within a union type is not supported.';
+                $message .= ' Consider using different properties on your object instead.';
+                throw new \RuntimeException(
+                    $message
+                );
+            }
+            if (array_key_exists('array', $typesByType) && count($customObjectTypes) > 0) {
+                throw new \RuntimeException(
+                    'Using array with custom objects as a union type is not supported.'
+                );
+            }
+            $dataType = strtolower(gettype($data));
+
+            if ($dataType === 'array' && !empty($customObjectTypes)) {
+                $type = $customObjectTypes[0];
+            } else {
+                $type = match (strtolower(gettype($data))) {
+                    'string' => $typesByType['string'],
+                    'boolean' => $typesByType['bool'],
+                    'integer' => $typesByType['int'],
+                    'array' => $typesByType['array'],
+                    'null' => $typesByType['null'],
+                };
+            }
+        }
+
 
         if (is_null($data) && $type && $type->allowsNull()) {
             return null;

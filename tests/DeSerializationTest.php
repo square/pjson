@@ -10,8 +10,12 @@ use Square\Pjson\Tests\Definitions\CatalogCategory;
 use Square\Pjson\Tests\Definitions\CatalogItem;
 use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
+use Square\Pjson\Tests\Definitions\Child;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
+use Square\Pjson\Tests\Definitions\UnionUsingArray;
+use Square\Pjson\Tests\Definitions\UnionUsingArrayAndObject;
+use Square\Pjson\Tests\Definitions\UnionUsingCustomObject;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
@@ -599,5 +603,69 @@ final class DeSerializationTest extends TestCase
         $this->expectException(MissingRequiredPropertyException::class);
 
         Token::fromJsonString($json);
+    }
+
+    public function testUnionTypes()
+    {
+        $caInt = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => 5
+        ]);
+
+        $caString = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => 'website-name'
+        ]);
+
+        $this->assertTrue(is_int($caInt->value));
+        $this->assertEquals(5, $caInt->value);
+
+        $this->assertTrue(is_string($caString->value));
+        $this->assertEquals('website-name', $caString->value);
+    }
+
+    public function testUnionTypesUsingNull()
+    {
+        $ca = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => null,
+        ]);
+        $this->assertNull($ca->value);
+    }
+
+    public function testUnionTypesUsingObject()
+    {
+        $ca = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
+        $this->assertInstanceOf(UnionUsingCustomObject::class, $ca->value);
+    }
+
+    public function testUnionTypesUsingArray()
+    {
+        $ca = UnionUsingArray::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
+        $this->assertIsArray($ca->value);
+    }
+
+    public function testUnionTypesUsingArrayAndCustomObject()
+    {
+        $this->expectException(\RuntimeException::class);
+        UnionUsingArrayAndObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
     }
 }
