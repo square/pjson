@@ -8,10 +8,8 @@ use Square\Pjson\JsonSerialize;
 class UnionUsingArray
 {
     use JsonSerialize;
-
     #[Json]
     public string $key;
-
     #[Json]
     public int|string|null|array $value;
 }
