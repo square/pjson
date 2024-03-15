@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Square\Pjson\Exceptions\MissingRequiredPropertyException;
+use Square\Pjson\Exceptions\UndecidableTypeException;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
@@ -13,11 +17,14 @@ use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
 use Square\Pjson\Tests\Definitions\MenuList;
-use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Privateer;
-use Square\Pjson\Tests\Definitions\Token;
+use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Stats;
+use Square\Pjson\Tests\Definitions\Token;
 use Square\Pjson\Tests\Definitions\Traitor;
+use Square\Pjson\Tests\Definitions\UnionUsingArray;
+use Square\Pjson\Tests\Definitions\UnionUsingArrayAndObject;
+use Square\Pjson\Tests\Definitions\UnionUsingCustomObject;
 use Square\Pjson\Tests\Definitions\Weekend;
 
 final class DeSerializationTest extends TestCase
@@ -37,6 +44,7 @@ final class DeSerializationTest extends TestCase
             foreach ($value as $k => $v) {
                 $r[$k] = $this->export($v);
             }
+
             return $r;
         }
         $rc = new ReflectionClass($value);
@@ -59,17 +67,17 @@ final class DeSerializationTest extends TestCase
         $c = Category::fromJsonString('{"identifier":"myid","category_name":"Clothes","data":{"name":null}}');
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" => null,
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => null,
-            "untypedSchedule" => null,
-          ], $this->export($c));
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => null,
+            'untypedSchedule' => null,
+        ], $this->export($c));
     }
 
     public function testNullableProperty()
@@ -84,17 +92,17 @@ final class DeSerializationTest extends TestCase
         }');
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" => null,
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => null,
-            "untypedSchedule" => null,
-          ], $this->export($c));
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => null,
+            'untypedSchedule' => null,
+        ], $this->export($c));
         $this->assertNull($c->nullableSchedule);
     }
 
@@ -112,17 +120,17 @@ final class DeSerializationTest extends TestCase
         $e = $this->export($bc);
         $this->assertEquals([
             '@class' => BigCat::class,
-            "data_name" => null,
-            "id" => "myid",
-            "name" => "Clothes",
-            "schedule" => null,
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => null,
-            "untypedSchedule" => null,
-          ], $this->export($bc));
+            'data_name' => null,
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'schedule' => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => null,
+            'untypedSchedule' => null,
+        ], $this->export($bc));
     }
 
     public function testInheritsTrait()
@@ -130,8 +138,8 @@ final class DeSerializationTest extends TestCase
         $s = Schedule::fromJsonString('{"schedule_start":1,"schedule_end":10}');
         $this->assertEquals([
             '@class' => Schedule::class,
-            "start" => 1,
-            "end" => 10,
+            'start' => 1,
+            'end' => 10,
         ], $this->export($s));
     }
 
@@ -150,20 +158,20 @@ final class DeSerializationTest extends TestCase
         }');
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" =>  [
-              '@class' => Schedule::class,
-              "start" => 1,
-              "end" => 20,
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => [
+                '@class' => Schedule::class,
+                'start' => 1,
+                'end' => 20,
             ],
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => null,
-            "untypedSchedule" => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => null,
+            'untypedSchedule' => null,
         ], $this->export($c));
     }
 
@@ -193,31 +201,31 @@ final class DeSerializationTest extends TestCase
         }');
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" => [
-              '@class' => Schedule::class,
-              "start" => 1,
-              "end" => 20,
-            ],
-            "nullableSchedule" => null,
-            "schedules" => [
-              0 => [
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => [
                 '@class' => Schedule::class,
-                "start" => 1,
-                "end" => 20,
-              ],
-              1 => [
-                '@class' => Schedule::class,
-                "start" => 30,
-                "end" => 40,
-              ],
+                'start' => 1,
+                'end' => 20,
             ],
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => null,
-            "untypedSchedule" => null,
+            'nullableSchedule' => null,
+            'schedules' => [
+                0 => [
+                    '@class' => Schedule::class,
+                    'start' => 1,
+                    'end' => 20,
+                ],
+                1 => [
+                    '@class' => Schedule::class,
+                    'start' => 30,
+                    'end' => 40,
+                ],
+            ],
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => null,
+            'untypedSchedule' => null,
         ], $this->export($c));
     }
 
@@ -237,21 +245,21 @@ final class DeSerializationTest extends TestCase
         }');
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" => null,
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [
-              0 => 1,
-              1 => "abc",
-              2 => 678,
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [
+                0 => 1,
+                1 => 'abc',
+                2 => 678,
             ],
-            "unnamed" => null,
-            "untypedSchedule" => null,
-          ], $this->export($c));
+            'unnamed' => null,
+            'untypedSchedule' => null,
+        ], $this->export($c));
     }
 
     public function testSerializesWithNoName()
@@ -267,17 +275,17 @@ final class DeSerializationTest extends TestCase
 
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" => null,
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => "bob",
-            "untypedSchedule" => null,
-          ], $this->export($c));
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => 'bob',
+            'untypedSchedule' => null,
+        ], $this->export($c));
     }
 
     public function testSerializesWithUntypedProp()
@@ -297,21 +305,21 @@ final class DeSerializationTest extends TestCase
 
         $this->assertEquals([
             '@class' => Category::class,
-            "id" => "myid",
-            "name" => "Clothes",
-            "data_name" => null,
-            "schedule" => null,
-            "nullableSchedule" => null,
-            "schedules" => null,
-            "nullableSchedules" => null,
-            "counts" => [],
-            "unnamed" => "bob",
-            "untypedSchedule" => [
+            'id' => 'myid',
+            'name' => 'Clothes',
+            'data_name' => null,
+            'schedule' => null,
+            'nullableSchedule' => null,
+            'schedules' => null,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => 'bob',
+            'untypedSchedule' => [
                 '@class' => Schedule::class,
-                "start" => 10,
-                "end" => 90,
+                'start' => 10,
+                'end' => 90,
             ],
-          ], $this->export($c));
+        ], $this->export($c));
     }
 
     public function testPrivateProps()
@@ -321,7 +329,7 @@ final class DeSerializationTest extends TestCase
         }');
         $this->assertEquals([
             '@class' => Privateer::class,
-            "name" => "Jenna",
+            'name' => 'Jenna',
         ], $this->export($p));
     }
 
@@ -341,17 +349,17 @@ final class DeSerializationTest extends TestCase
         }');
         $this->assertEquals([
             '@class' => Weekend::class,
-            "weekend" => [
-              "sat" => [
-                '@class' => Schedule::class,
-                "start" => 1,
-                "end" => 2,
-              ],
-              "sun" => [
-                '@class' => Schedule::class,
-                "start" => 3,
-                "end" => 4,
-              ],
+            'weekend' => [
+                'sat' => [
+                    '@class' => Schedule::class,
+                    'start' => 1,
+                    'end' => 2,
+                ],
+                'sun' => [
+                    '@class' => Schedule::class,
+                    'start' => 3,
+                    'end' => 4,
+                ],
             ],
         ], $this->export($w));
     }
@@ -361,8 +369,8 @@ final class DeSerializationTest extends TestCase
         $t = Traitor::fromJsonString('{"secretly_working_for": "MI6"}');
 
         $this->assertEquals([
-            "@class" => Traitor::class,
-            "secretly_working_for" => "MI6"
+            '@class' => Traitor::class,
+            'secretly_working_for' => 'MI6',
         ], $this->export($t));
     }
 
@@ -372,19 +380,19 @@ final class DeSerializationTest extends TestCase
         $c = CatalogObject::fromJsonString($jsonCat);
 
         $this->assertEquals([
-            "@class" => CatalogCategory::class,
-            "parentCategoryId" => "456",
-            "id" => "123",
-            "type" => "category",
+            '@class' => CatalogCategory::class,
+            'parentCategoryId' => '456',
+            'id' => '123',
+            'type' => 'category',
         ], $this->export($c));
 
         $jsonItem = '{"type": "item", "id": "123", "name": "Sandals"}';
         $c = CatalogObject::fromJsonString($jsonItem);
         $this->assertEquals([
-            "@class" => CatalogItem::class,
-            "name" => "Sandals",
-            "id" => "123",
-            "type" => "item",
+            '@class' => CatalogItem::class,
+            'name' => 'Sandals',
+            'id' => '123',
+            'type' => 'item',
         ], $this->export($c));
     }
 
@@ -407,20 +415,20 @@ final class DeSerializationTest extends TestCase
 
         $this->assertEquals([
             [
-              "@class" => Schedule::class,
-              "start" => 1,
-              "end" => 2,
+                '@class' => Schedule::class,
+                'start' => 1,
+                'end' => 2,
             ],
             [
-              "@class" => Schedule::class,
-              "start" => 11,
-              "end" => 22,
+                '@class' => Schedule::class,
+                'start' => 11,
+                'end' => 22,
             ],
             [
-              "@class" => Schedule::class,
-              "start" => 111,
-              "end" => 222,
-            ]
+                '@class' => Schedule::class,
+                'start' => 111,
+                'end' => 222,
+            ],
         ], $this->export($deser));
     }
 
@@ -433,9 +441,9 @@ final class DeSerializationTest extends TestCase
             }
         }', path: 'data');
         $this->assertEquals([
-            "@class" => Schedule::class,
-            "start" => 1,
-            "end" => 2,
+            '@class' => Schedule::class,
+            'start' => 1,
+            'end' => 2,
         ], $this->export($deser));
 
         $deser = Schedule::fromJsonString('{
@@ -447,9 +455,9 @@ final class DeSerializationTest extends TestCase
             }
         }', path: ['data', 'first_schedule']);
         $this->assertEquals([
-            "@class" => Schedule::class,
-            "start" => 1,
-            "end" => 2,
+            '@class' => Schedule::class,
+            'start' => 1,
+            'end' => 2,
         ], $this->export($deser));
 
         $deser = Schedule::listFromJsonString('{
@@ -462,10 +470,10 @@ final class DeSerializationTest extends TestCase
         }', path: 'data');
         $this->assertEquals([
             [
-                "@class" => Schedule::class,
-                "start" => 1,
-                "end" => 2,
-            ]
+                '@class' => Schedule::class,
+                'start' => 1,
+                'end' => 2,
+            ],
         ], $this->export($deser));
 
         $deser = Schedule::listFromJsonString('{
@@ -480,24 +488,24 @@ final class DeSerializationTest extends TestCase
         }', path: ['data', 'first_schedule']);
         $this->assertEquals([
             [
-                "@class" => Schedule::class,
-                "start" => 1,
-                "end" => 2,
-            ]
+                '@class' => Schedule::class,
+                'start' => 1,
+                'end' => 2,
+            ],
         ], $this->export($deser));
     }
 
     public function testClassToScalar()
     {
-        $stats =Stats::fromJsonString('{
+        $stats = Stats::fromJsonString('{
             "count": "123456789876543234567898765432345678976543234567876543212345678765432"
         }');
         $this->assertEquals([
-            "@class" => Stats::class,
-            "count" => [
-              "@class" => BigInt::class,
-              "value" => "123456789876543234567898765432345678976543234567876543212345678765432",
-            ]
+            '@class' => Stats::class,
+            'count' => [
+                '@class' => BigInt::class,
+                'value' => '123456789876543234567898765432345678976543234567876543212345678765432',
+            ],
         ], $this->export($stats));
     }
 
@@ -513,8 +521,8 @@ final class DeSerializationTest extends TestCase
         $dl = MenuList::fromJsonString($json);
 
         $this->assertEquals([
-            "@class" => MenuList::class,
-            "mainMenuName" => "main-menu"
+            '@class' => MenuList::class,
+            'mainMenuName' => 'main-menu',
         ], $this->export($dl));
     }
 
@@ -556,25 +564,25 @@ final class DeSerializationTest extends TestCase
         $data = Collector::fromJsonString($json);
 
         $collectionStructure = [
-            "@class" => Collection::class,
-            "items" => [
+            '@class' => Collection::class,
+            'items' => [
                 [
-                    "@class" => Schedule::class,
-                    "start" => 1,
-                    "end" => 2,
+                    '@class' => Schedule::class,
+                    'start' => 1,
+                    'end' => 2,
                 ],
                 [
-                    "@class" => Schedule::class,
-                    "start" => 10,
-                    "end" => 20,
+                    '@class' => Schedule::class,
+                    'start' => 10,
+                    'end' => 20,
                 ],
-            ]
+            ],
         ];
         $this->assertEquals([
-            "@class" => Collector::class,
-            "schedules" => $collectionStructure,
-            "factoried_schedules" => $collectionStructure,
-            "static_factoried_schedules" => $collectionStructure,
+            '@class' => Collector::class,
+            'schedules' => $collectionStructure,
+            'factoried_schedules' => $collectionStructure,
+            'static_factoried_schedules' => $collectionStructure,
         ], $this->export($data));
     }
 
@@ -587,8 +595,8 @@ final class DeSerializationTest extends TestCase
         $token = Token::fromJsonString($json);
 
         $this->assertEquals([
-            "@class" => Token::class,
-            "key" => "my_key",
+            '@class' => Token::class,
+            'key' => 'my_key',
         ], $this->export($token));
     }
 
@@ -599,5 +607,69 @@ final class DeSerializationTest extends TestCase
         $this->expectException(MissingRequiredPropertyException::class);
 
         Token::fromJsonString($json);
+    }
+
+    public function testUnionTypes()
+    {
+        $caInt = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => 5,
+        ]);
+
+        $caString = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => 'website-name',
+        ]);
+
+        $this->assertTrue(is_int($caInt->value));
+        $this->assertEquals(5, $caInt->value);
+
+        $this->assertTrue(is_string($caString->value));
+        $this->assertEquals('website-name', $caString->value);
+    }
+
+    public function testUnionTypesUsingNull()
+    {
+        $ca = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => null,
+        ]);
+        $this->assertNull($ca->value);
+    }
+
+    public function testUnionTypesUsingObject()
+    {
+        $ca = UnionUsingCustomObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
+        $this->assertInstanceOf(UnionUsingCustomObject::class, $ca->value);
+    }
+
+    public function testUnionTypesUsingArray()
+    {
+        $ca = UnionUsingArray::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
+        $this->assertIsArray($ca->value);
+    }
+
+    public function testUnionTypesUsingArrayAndCustomObject()
+    {
+        $this->expectException(UndecidableTypeException::class);
+        UnionUsingArrayAndObject::fromJsonData([
+            'key' => 'unique-key',
+            'value' => [
+                'key' => 'child',
+                'value' => 'string',
+            ],
+        ]);
     }
 }

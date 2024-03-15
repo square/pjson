@@ -1,11 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Square\Pjson;
 
 use Attribute;
 use ReflectionNamedType;
 use ReflectionProperty;
+use ReflectionUnionType;
 use Square\Pjson\Exceptions\MissingRequiredPropertyException;
 use Square\Pjson\Internal\RClass;
+use Square\Pjson\Internal\RUnionType;
 use Traversable;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -48,26 +53,31 @@ class Json
      * Receive the property this attribute was set on. If the attribute was created without a name, we grab
      * the property's name instead.
      */
-    public function forProperty(ReflectionProperty $prop) : Json
+    public function forProperty(ReflectionProperty $prop): Json
     {
         if (isset($this->path)) {
             return $this;
         }
 
         $this->path = [$prop->getName()];
+
         return $this;
     }
 
     /**
      * Builds the PHP value from the json data and a type if available
      */
-    public function retrieveValue(?array $data, ?ReflectionNamedType $type = null)
+    public function retrieveValue(?array $data, ReflectionNamedType|ReflectionUnionType|null $type = null)
     {
         foreach ($this->path as $pathBit) {
-            if (!array_key_exists($pathBit, $data)) {
+            if (! array_key_exists($pathBit, $data)) {
                 return $this->handleMissingValue($data);
             }
             $data = $data[$pathBit];
+        }
+
+        if ($type instanceof ReflectionUnionType) {
+            $type = RUnionType::getSingleTypeMatch($type, $data);
         }
 
         if (is_null($data) && $type && $type->allowsNull()) {
@@ -77,17 +87,19 @@ class Json
         if ($type === null) {
             if (isset($this->type)) {
                 $t = $this->type;
+
                 return $t::fromJsonData($data);
             }
+
             return $data;
         }
 
         $typename = $type->getName();
 
-        if (!class_exists($typename) && ($typename !== 'array' || !isset($this->type))) {
+        if (! class_exists($typename) && ($typename !== 'array' || ! isset($this->type))) {
             return $data;
         }
-        if (!class_exists($typename) && $typename === 'array' && isset($this->type)) {
+        if (! class_exists($typename) && $typename === 'array' && isset($this->type)) {
             if (is_null($data)) {
                 return $data;
             }
@@ -102,7 +114,7 @@ class Json
         // Deal with collections / Traversable classes
         if (class_exists($typename) && $this->isCollection($typename) && isset($this->type)) {
             $mapped = array_map(fn ($d) => $this->type::fromJsonData($d), $data);
-            if (!isset($this->collection_factory_method) || $this->collection_factory_method === '') {
+            if (! isset($this->collection_factory_method) || $this->collection_factory_method === '') {
                 return new $typename($mapped);
             }
             if (RClass::make($typename)->isMethodStatic($this->collection_factory_method)) {
@@ -112,6 +124,7 @@ class Json
             $r = RClass::make($typename);
             $instance = $r->source()->newInstanceWithoutConstructor();
             $instance->{$this->collection_factory_method}($mapped);
+
             return $instance;
         }
 
@@ -123,6 +136,7 @@ class Json
             if ($type->allowsNull()) {
                 return $typename::tryFrom($data);
             }
+
             return $typename::from($data);
         }
 
@@ -137,6 +151,7 @@ class Json
         if ($this->required) {
             throw new MissingRequiredPropertyException($this->path, json_encode($data));
         }
+
         return null;
     }
 
@@ -148,7 +163,7 @@ class Json
     /**
      * Whether or not a value is empty
      */
-    protected function isEmpty($value) : bool
+    protected function isEmpty($value): bool
     {
         if ($value === null) {
             return true;
@@ -173,14 +188,14 @@ class Json
         if ($this->omit_empty && $this->isEmpty($value)) {
             return;
         }
-        $max = count($this->path)-1;
+        $max = count($this->path) - 1;
         $d = &$data;
         foreach ($this->path as $i => $pathBit) {
             if (array_key_exists($pathBit, $d) && $i === $max) {
                 throw new \Exception('invalid path: '.json_encode($this->path));
             }
 
-            if ((!array_key_exists($pathBit, $d) || is_null($d[$pathBit])) && $i < $max) {
+            if ((! array_key_exists($pathBit, $d) || is_null($d[$pathBit])) && $i < $max) {
                 $d[$pathBit] = [];
             }
 
@@ -203,7 +218,7 @@ class Json
 
     protected function jsonValue($value)
     {
-        if (!is_object($value)) {
+        if (! is_object($value)) {
             return $value;
         }
 
