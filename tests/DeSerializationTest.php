@@ -29,7 +29,10 @@ use Square\Pjson\Tests\Definitions\Weekend;
 
 final class DeSerializationTest extends TestCase
 {
-    public function export($value)
+
+    const UNINITIALIZED = '@uninitialized';
+    
+    function export($value)
     {
         if (is_null($value)) {
             return $value;
@@ -53,7 +56,7 @@ final class DeSerializationTest extends TestCase
         ];
         foreach ($rc->getProperties() as $prop) {
             $prop->setAccessible(true);
-            $v = $prop->isInitialized($value) ? $prop->getValue($value) : null;
+            $v = $prop->isInitialized($value) ? $prop->getValue($value) : self::UNINITIALIZED;
             $n = $prop->getName();
 
             $data[$n] = $this->export($v);
@@ -70,12 +73,12 @@ final class DeSerializationTest extends TestCase
             'id' => 'myid',
             'name' => 'Clothes',
             'data_name' => null,
-            'schedule' => null,
+            'schedule' => self::UNINITIALIZED,
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [],
-            'unnamed' => null,
+            'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($c));
     }
@@ -95,12 +98,12 @@ final class DeSerializationTest extends TestCase
             'id' => 'myid',
             'name' => 'Clothes',
             'data_name' => null,
-            'schedule' => null,
+            'schedule' => self::UNINITIALIZED,
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [],
-            'unnamed' => null,
+            'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($c));
         $this->assertNull($c->nullableSchedule);
@@ -123,12 +126,12 @@ final class DeSerializationTest extends TestCase
             'data_name' => null,
             'id' => 'myid',
             'name' => 'Clothes',
-            'schedule' => null,
+            'schedule' => self::UNINITIALIZED,
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [],
-            'unnamed' => null,
+            'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($bc));
     }
@@ -167,10 +170,10 @@ final class DeSerializationTest extends TestCase
                 'end' => 20,
             ],
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [],
-            'unnamed' => null,
+            'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($c));
     }
@@ -224,7 +227,7 @@ final class DeSerializationTest extends TestCase
             ],
             'nullableSchedules' => null,
             'counts' => [],
-            'unnamed' => null,
+            'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($c));
     }
@@ -248,16 +251,16 @@ final class DeSerializationTest extends TestCase
             'id' => 'myid',
             'name' => 'Clothes',
             'data_name' => null,
-            'schedule' => null,
+            'schedule' => self::UNINITIALIZED,
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [
                 0 => 1,
                 1 => 'abc',
                 2 => 678,
             ],
-            'unnamed' => null,
+            'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($c));
     }
@@ -278,9 +281,9 @@ final class DeSerializationTest extends TestCase
             'id' => 'myid',
             'name' => 'Clothes',
             'data_name' => null,
-            'schedule' => null,
+            'schedule' => self::UNINITIALIZED,
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [],
             'unnamed' => 'bob',
@@ -308,9 +311,9 @@ final class DeSerializationTest extends TestCase
             'id' => 'myid',
             'name' => 'Clothes',
             'data_name' => null,
-            'schedule' => null,
+            'schedule' => self::UNINITIALIZED,
             'nullableSchedule' => null,
-            'schedules' => null,
+            'schedules' => self::UNINITIALIZED,
             'nullableSchedules' => null,
             'counts' => [],
             'unnamed' => 'bob',
