@@ -675,4 +675,40 @@ final class DeSerializationTest extends TestCase
             ],
         ]);
     }
+
+    public function testNonNullableFieldWithNullValue()
+    {
+        $c = Category::fromJsonString('{"next_schedule": null}');
+        $this->assertEquals([
+            '@class' => Category::class,
+            'id' => null, 
+            'name' => null, 
+            'data_name' => null, 
+            'schedule' =>  self::UNINITIALIZED, // should stay uninitialized because it's a non-nullable field
+            'nullableSchedule' => null,
+            'schedules' => self::UNINITIALIZED,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => self::UNINITIALIZED,
+            'untypedSchedule' => null,
+        ], $this->export($c));
+    }
+
+    public function testNullParentObjectForNestedPath()
+    {
+        $c = Category::fromJsonString('{"data": null}');
+        $this->assertEquals([
+            '@class' => Category::class,
+            'id' => null,
+            'name' => null,
+            'data_name' => null, // set to null because the parent object is null and it can be null
+            'schedule' =>  self::UNINITIALIZED,
+            'nullableSchedule' => null,
+            'schedules' => self::UNINITIALIZED,
+            'nullableSchedules' => null,
+            'counts' => [],
+            'unnamed' => self::UNINITIALIZED,
+            'untypedSchedule' => null,
+        ], $this->export($c));
+    }
 }
