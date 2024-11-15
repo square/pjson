@@ -32,7 +32,7 @@ final class DeSerializationTest extends TestCase
 
     const UNINITIALIZED = '@uninitialized';
     
-    function export($value)
+    public function export($value)
     {
         if (is_null($value)) {
             return $value;
