@@ -681,9 +681,9 @@ final class DeSerializationTest extends TestCase
         $c = Category::fromJsonString('{"next_schedule": null}');
         $this->assertEquals([
             '@class' => Category::class,
-            'id' => null, 
-            'name' => null, 
-            'data_name' => null, 
+            'id' => null,
+            'name' => null,
+            'data_name' => null,
             'schedule' =>  self::UNINITIALIZED, // should stay uninitialized because it's a non-nullable field
             'nullableSchedule' => null,
             'schedules' => self::UNINITIALIZED,
