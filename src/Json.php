@@ -70,18 +70,17 @@ class Json
     public function retrieveValue(?array $data, ReflectionNamedType|ReflectionUnionType|null $type = null)
     {
         foreach ($this->path as $pathBit) {
-            if (! array_key_exists($pathBit, $data)) {
+            if (is_null($data) || ! array_key_exists($pathBit, $data)) {
                 return $this->handleMissingValue($data);
             }
             $data = $data[$pathBit];
         }
+        if (is_null($data)) {
+            return null;
+        }
 
         if ($type instanceof ReflectionUnionType) {
             $type = RUnionType::getSingleTypeMatch($type, $data);
-        }
-
-        if (is_null($data) && $type && $type->allowsNull()) {
-            return null;
         }
 
         if ($type === null) {
@@ -100,10 +99,6 @@ class Json
             return $data;
         }
         if (! class_exists($typename) && $typename === 'array' && isset($this->type)) {
-            if (is_null($data)) {
-                return $data;
-            }
-
             if (RClass::make($this->type)->isBackedEnum()) {
                 return array_map(fn ($d) => $this->type::from($d), $data);
             }

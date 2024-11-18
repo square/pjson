@@ -11,6 +11,8 @@ use Square\Pjson\Tests\Definitions\Widget;
 
 final class Php81DeSerializationTest extends TestCase
 {
+    const UNINITIALIZED = '@uninitialized';
+
     public function export($value)
     {
         if (is_null($value)) {
@@ -33,7 +35,7 @@ final class Php81DeSerializationTest extends TestCase
             '@class' => get_class($value),
         ];
         foreach ($rc->getProperties() as $prop) {
-            $v = $prop->isInitialized($value) ? $prop->getValue($value) : '@uninitialized';
+            $v = $prop->isInitialized($value) ? $prop->getValue($value) : self::UNINITIALIZED;
             $n = $prop->getName();
 
             $data[$n] = $this->export($v);
@@ -67,7 +69,7 @@ final class Php81DeSerializationTest extends TestCase
               "value" => "ON",
             ],
             "optional" => null,
-            "size" => '@uninitialized',
+            "size" => self::UNINITIALIZED,
         ], $this->export($w));
     }
 
