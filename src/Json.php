@@ -18,6 +18,12 @@ class Json
 {
     protected array $path;
 
+    /**
+     * Sometimes we want to link back to the parent object.
+     * This is a reference to the parent objects available for such cases.
+     */
+    protected static array $parentStack = [];
+
     protected string $type;
 
     protected bool $omit_empty;
@@ -65,10 +71,38 @@ class Json
     }
 
     /**
+     * Adds a parent in the stack of parents that we use to be able to link parents
+     * from the children objects.
+     */
+    public static function withParent(mixed $parent, callable $cb): mixed
+    {
+        static::$parentStack[] = $parent;
+        try {
+            return $cb();
+        } finally {
+            array_pop(static::$parentStack);
+        }
+    }
+
+    /**
+     * Whether or not we marked this property as linking back to the parent object.
+     * This is done via a separate attribute JsonParent
+     */
+    public function linksToParentObject(): bool
+    {
+        return false;
+    }
+
+    /**
      * Builds the PHP value from the json data and a type if available
      */
     public function retrieveValue(?array $data, ReflectionNamedType|ReflectionUnionType|null $type = null)
     {
+        if ($this->linksToParentObject()) {
+            end(static::$parentStack);
+
+            return prev(static::$parentStack);
+        }
         foreach ($this->path as $pathBit) {
             if (is_null($data) || ! array_key_exists($pathBit, $data)) {
                 return $this->handleMissingValue($data);

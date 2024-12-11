@@ -16,6 +16,7 @@ use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Collection;
 use Square\Pjson\Tests\Definitions\Collector;
+use Square\Pjson\Tests\Definitions\LinkParent;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Privateer;
 use Square\Pjson\Tests\Definitions\Schedule;
@@ -710,5 +711,27 @@ final class DeSerializationTest extends TestCase
             'unnamed' => self::UNINITIALIZED,
             'untypedSchedule' => null,
         ], $this->export($c));
+    }
+
+    public function testLinkToParent()
+    {
+        $d = LinkParent::fromJsonString('{
+            "name": "Millie",
+            "child": {
+                "name": "bob"
+            },
+            "children": [
+                {"name": "Alice"},
+                {"name": "Caroline"}
+            ]
+        }');
+
+        $this->assertEquals($d->name, 'Millie');
+        $this->assertEquals($d->child->name, 'bob');
+        $this->assertEquals($d->child->parent, $d);
+        $this->assertEquals($d->children[0]->name, 'Alice');
+        $this->assertEquals($d->children[0]->parent, $d);
+        $this->assertEquals($d->children[1]->name, 'Caroline');
+        $this->assertEquals($d->children[1]->parent, $d);
     }
 }

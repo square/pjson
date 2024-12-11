@@ -1,16 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Square\Pjson;
 
+use const JSON_THROW_ON_ERROR;
+
 use ReflectionAttribute;
 use Square\Pjson\Internal\RClass;
-use const JSON_THROW_ON_ERROR;
 
 trait JsonSerialize
 {
-    public function toJson(int $flags = 0, int $depth = 512) : string
+    public function toJson(int $flags = 0, int $depth = 512): string
     {
         $flags |= JSON_THROW_ON_ERROR;
+
         return json_encode($this->toJsonData(), flags: $flags, depth: $depth);
     }
 
@@ -33,14 +37,15 @@ trait JsonSerialize
         return $d;
     }
 
-    public static function toJsonListData(array $data) : array
+    public static function toJsonListData(array $data): array
     {
         return array_map(fn ($d) => $d->toJsonData(), $data);
     }
 
-    public static function toJsonList(array $data, int $flags = 0, int $depth = 512) : string
+    public static function toJsonList(array $data, int $flags = 0, int $depth = 512): string
     {
         $flags |= JSON_THROW_ON_ERROR;
+
         return json_encode(static::toJsonListData($data), flags: $flags, depth: $depth);
     }
 
@@ -49,9 +54,10 @@ trait JsonSerialize
         array|string $path = [],
         int $depth = 512,
         int $flags = 0,
-    ) : static {
+    ): static {
         $flags |= JSON_THROW_ON_ERROR;
         $jd = json_decode($json, associative: true, flags: $flags, depth: $depth);
+
         return self::fromJsonData($jd, $path);
     }
 
@@ -60,13 +66,14 @@ trait JsonSerialize
         array|string $path = [],
         int $depth = 512,
         int $flags = 0,
-    ) : array {
+    ): array {
         $flags |= JSON_THROW_ON_ERROR;
         $jd = json_decode($json, associative: true, flags: $flags, depth: $depth);
+
         return static::listfromJsonData($jd, $path);
     }
 
-    public static function listfromJsonData(array $json, array|string $path = []) : array
+    public static function listfromJsonData(array $json, array|string $path = []): array
     {
         if (is_string($path)) {
             $path = [$path];
@@ -74,10 +81,11 @@ trait JsonSerialize
         foreach ($path as $pathBit) {
             $json = $json[$pathBit];
         }
+
         return array_map(fn ($d) => static::fromJsonData($d), $json);
     }
 
-    public static function fromJsonData($jd, array|string $path = []) : static
+    public static function fromJsonData($jd, array|string $path = []): static
     {
         if (is_string($path)) {
             $path = [$path];
@@ -97,13 +105,14 @@ trait JsonSerialize
             $a = $attrs[0];
 
             $type = $prop->getType();
-            $v = $a->newInstance()->forProperty($prop)->retrieveValue($jd, $type);
-            if (is_null($v) && $type && !$type->allowsNull()) {
+            $v = Json::withParent($return, fn () => $a->newInstance()->forProperty($prop)->retrieveValue($jd, $type));
+            if (is_null($v) && $type && ! $type->allowsNull()) {
                 continue;
             }
 
             $prop->setValue($return, $v);
         }
+
         return $return;
     }
 }

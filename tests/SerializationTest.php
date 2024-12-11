@@ -1,9 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Square\Pjson\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Square\Pjson\JsonSerialize;
 use Square\Pjson\Json;
+use Square\Pjson\JsonSerialize;
 use Square\Pjson\Tests\Definitions\BigCat;
 use Square\Pjson\Tests\Definitions\BigInt;
 use Square\Pjson\Tests\Definitions\CatalogCategory;
@@ -12,6 +15,7 @@ use Square\Pjson\Tests\Definitions\CatalogObject;
 use Square\Pjson\Tests\Definitions\Category;
 use Square\Pjson\Tests\Definitions\Child;
 use Square\Pjson\Tests\Definitions\Collector;
+use Square\Pjson\Tests\Definitions\LinkParent;
 use Square\Pjson\Tests\Definitions\MenuList;
 use Square\Pjson\Tests\Definitions\Privateer;
 use Square\Pjson\Tests\Definitions\Schedule;
@@ -44,7 +48,7 @@ final class SerializationTest extends TestCase
     public function testSerializeAcceptsJsonFlags()
     {
         $c = new Category;
-        $expected = <<<JSON
+        $expected = <<<'JSON'
         {
             "identifier": "myid",
             "category_name": "Clothes",
@@ -54,13 +58,13 @@ final class SerializationTest extends TestCase
         }
         JSON;
 
-
         $this->assertEquals($expected, $c->toJson(flags: JSON_PRETTY_PRINT));
     }
 
     public function testSerializeThrowsOnJsonError()
     {
-        $c = new class {
+        $c = new class
+        {
             use JsonSerialize;
 
             public function __construct(
@@ -239,7 +243,7 @@ final class SerializationTest extends TestCase
     public function testClassToScalar()
     {
         $stats = new Stats;
-        $stats->count = new BigInt("123456789876543234567898765432345678976543234567876543212345678765432");
+        $stats->count = new BigInt('123456789876543234567898765432345678976543234567876543212345678765432');
         $this->assertEquals(
             '{"count":"123456789876543234567898765432345678976543234567876543212345678765432"}',
             $stats->toJson()
@@ -306,14 +310,32 @@ final class SerializationTest extends TestCase
     {
         // Ensure that while the `parent` object is null, we can still serialize the parent.id property which is
         // nested under `parent`.
-        $data = new Child();
+        $data = new Child;
         $json = '{"identifier":null,"parent":{"id":null}}';
 
         $this->assertEquals($this->comparableJson($json), $data->toJson());
     }
 
-    protected function comparableJson(string $json) : string
+    protected function comparableJson(string $json): string
     {
         return json_encode(json_decode($json));
+    }
+
+    public function testLinkedParents()
+    {
+        $d = LinkParent::fromJsonString('{
+            "name": "Millie",
+            "child": {
+                "name": "bob"
+            },
+            "children": [
+                {"name": "Alice"},
+                {"name": "Caroline"}
+            ]
+        }');
+
+        $this->assertEquals(json_encode(json_decode(
+            '{"child":{"name":"bob"},"children":[{"name":"Alice"},{"name":"Caroline"}],"name":"Millie"}'
+        )), $d->toJson());
     }
 }
