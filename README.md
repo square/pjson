@@ -502,6 +502,46 @@ $token = Token::fromJsonString('{"key":"data"}'); // successful
 Token::fromJsonString('{"other":"has no key"}'); // throws Exception
 ```
 
+### Strict Deserialization Mode
+By default, pjson doesn't throw an exception if a non-nullable property is missing from the received JSON data. Instead,
+the property will remain uninitialized. 
+
+If you want to throw an exception in such cases, you can enable strict deserialization mode by adding the
+`#[JsonStrictDeserialize]` attribute to the class being deserialized.
+
+```php
+#[JsonStrictDeserialize]
+class Store
+{
+    use JsonSerialize;
+    
+    protected string $name;
+}
+Store::fromJsonString('{}'); // throws TypeError(""Property 'name' is non-nullable"")
+```
+
+The difference between the standard deserialization and `JsonStrictDeserialize` is shown in the tables below. The table
+shows the resultant value of a field after deserialization for every combination of declared type and received JSON type.
+
+##### Standard deserialization
+| **PHP Declared Type** |         |           | **JSON Received Type** |                       |
+|-----------------------|---------|-----------|------------------------|-----------------------|
+|                       | **foo** | **bar**   | **null**               | **field not present** |
+|        **none**       | foo     | bar       | null                   | null                  |
+|        **?foo**       | foo     | TypeError | null                   | null                  |
+|        **foo**        | foo     | TypeError | uninitialized          | uninitialized         |
+
+##### JsonStrictDeserialize
+| **PHP Declared Type** |         |           | **JSON Received Type** |                       |
+|-----------------------|---------|-----------|------------------------|-----------------------|
+|                       | **foo** | **bar**   | **null**               | **field not present** |
+|        **none**       | foo     | bar       | null                   | null                  |
+|        **?foo**       | foo     | TypeError | null                   | null                  |
+|        **foo**        | foo     | TypeError | TypeError              | TypeError             |
+
+So use `JsonStrictDeserialize` if you want to ensure that all non-nullable properties are present in the received JSON data.
+In this mode, pjson will throw a `TypeError` if a non-nullable property is missing.
+
 ### Scalar <=> Class
 In some cases, you might want a scalar value to become a PHP object once deserialized and vice-versa. For example, a `BigInt` class
 could hold an int as a string and represent it as a string when serialized to JSON:
