@@ -89,7 +89,8 @@ class Json
     public static function isInStrictMode(RClass $r): bool
     {
         if (!empty(
-            $r->source()->getAttributes(JsonStrictDeserialize::class, ReflectionAttribute::IS_INSTANCEOF))
+            $r->source()->getAttributes(JsonStrictDeserialize::class, ReflectionAttribute::IS_INSTANCEOF)
+        )
         ) {
             return true;
         }
@@ -98,7 +99,8 @@ class Json
         foreach (static::$parentStack as $parent) {
             $refClass = new ReflectionClass($parent);
             if (!empty(
-                $refClass->getAttributes(JsonStrictDeserialize::class, ReflectionAttribute::IS_INSTANCEOF))
+                $refClass->getAttributes(JsonStrictDeserialize::class, ReflectionAttribute::IS_INSTANCEOF)
+            )
             ) {
                 return true;
             }

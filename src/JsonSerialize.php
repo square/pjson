@@ -98,7 +98,7 @@ trait JsonSerialize
         $r = RClass::make(static::class);
         $props = $r->getProperties();
         $return = $r->source()->newInstanceWithoutConstructor();
-        $strictMode = JSON::isInStrictMode($r);
+        $strictMode = Json::isInStrictMode($r);
 
         foreach ($props as $prop) {
             $attrs = $prop->getAttributes(Json::class, ReflectionAttribute::IS_INSTANCEOF);

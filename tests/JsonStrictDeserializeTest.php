@@ -11,7 +11,6 @@ use Square\Pjson\Tests\Definitions\Schedule;
 use Square\Pjson\Tests\Definitions\Store;
 use TypeError;
 
-
 final class JsonStrictDeserializeTest extends TestCase
 {
 
@@ -480,5 +479,4 @@ final class JsonStrictDeserializeTest extends TestCase
             }
         }');
     }
-    
 }
