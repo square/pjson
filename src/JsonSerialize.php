@@ -8,6 +8,7 @@ use const JSON_THROW_ON_ERROR;
 
 use ReflectionAttribute;
 use Square\Pjson\Internal\RClass;
+use TypeError;
 
 trait JsonSerialize
 {
@@ -97,6 +98,8 @@ trait JsonSerialize
         $r = RClass::make(static::class);
         $props = $r->getProperties();
         $return = $r->source()->newInstanceWithoutConstructor();
+        $strictMode = JSON::isInStrictMode($r);
+
         foreach ($props as $prop) {
             $attrs = $prop->getAttributes(Json::class, ReflectionAttribute::IS_INSTANCEOF);
             if (empty($attrs)) {
@@ -107,7 +110,12 @@ trait JsonSerialize
             $type = $prop->getType();
             $v = Json::withParent($return, fn () => $a->newInstance()->forProperty($prop)->retrieveValue($jd, $type));
             if (is_null($v) && $type && ! $type->allowsNull()) {
-                continue;
+                if ($strictMode) {
+                    throw new TypeError("Property '{$prop->getName()}' is non-nullable");
+                } else {
+                    // leave uninitialized and move on to the next property
+                    continue;
+                }
             }
 
             $prop->setValue($return, $v);
