@@ -88,20 +88,15 @@ class Json
 
     public static function isInStrictMode(RClass $r): bool
     {
-        if (!empty(
-            $r->source()->getAttributes(JsonStrictDeserialize::class, ReflectionAttribute::IS_INSTANCEOF)
-        )
-        ) {
+        $strictModeAttr = JsonStrictDeserialize::class;
+        
+        if (!empty($r->source()->getAttributes($strictModeAttr, ReflectionAttribute::IS_INSTANCEOF))) {
             return true;
         }
-        
-        // check parents in the deserialization stack
+        // check parent classes in the deserialization stack
         foreach (static::$parentStack as $parent) {
             $refClass = new ReflectionClass($parent);
-            if (!empty(
-                $refClass->getAttributes(JsonStrictDeserialize::class, ReflectionAttribute::IS_INSTANCEOF)
-            )
-            ) {
+            if (!empty($refClass->getAttributes($strictModeAttr, ReflectionAttribute::IS_INSTANCEOF))) {
                 return true;
             }
         }
