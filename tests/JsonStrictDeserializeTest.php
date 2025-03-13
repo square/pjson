@@ -370,7 +370,7 @@ final class JsonStrictDeserializeTest extends TestCase
         }');
     }
 
-    public function testStrictModeAppliesToNestedObjects_nullField()
+    public function testStrictModeAppliesToNestedObjectsNullField()
     {
         $this->expectException(TypeError::class);
         $this->expectExceptionMessage("Property 'start' is non-nullable");
@@ -398,7 +398,7 @@ final class JsonStrictDeserializeTest extends TestCase
         }');
     }
 
-    public function testStrictModeAppliesToNestedObjects_missingField()
+    public function testStrictModeAppliesToNestedObjectsMissingField()
     {
         $this->expectException(TypeError::class);
         $this->expectExceptionMessage("Property 'start' is non-nullable");
@@ -425,7 +425,7 @@ final class JsonStrictDeserializeTest extends TestCase
         }');
     }
 
-    public function testStrictModeAppliesToNestedArrayElements_nullField()
+    public function testStrictModeAppliesToNestedArrayElementsNullField()
     {
         $this->expectException(TypeError::class);
         $this->expectExceptionMessage("Property 'start' is non-nullable");
@@ -453,7 +453,7 @@ final class JsonStrictDeserializeTest extends TestCase
         }');
     }
 
-    public function testStrictModeAppliesToNestedArrayElements_missingField()
+    public function testStrictModeAppliesToNestedArrayElementsMissingField()
     {
         $this->expectException(TypeError::class);
         $this->expectExceptionMessage("Property 'start' is non-nullable");
