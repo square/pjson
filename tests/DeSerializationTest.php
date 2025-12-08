@@ -56,7 +56,6 @@ final class DeSerializationTest extends TestCase
             '@class' => get_class($value),
         ];
         foreach ($rc->getProperties() as $prop) {
-            $prop->setAccessible(true);
             $v = $prop->isInitialized($value) ? $prop->getValue($value) : self::UNINITIALIZED;
             $n = $prop->getName();
 
