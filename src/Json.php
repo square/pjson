@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Square\Pjson;
 
 use Attribute;
+use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
@@ -82,6 +84,24 @@ class Json
         } finally {
             array_pop(static::$parentStack);
         }
+    }
+
+    public static function isInStrictMode(RClass $r): bool
+    {
+        $strictModeAttr = JsonStrictDeserialize::class;
+        
+        if (!empty($r->source()->getAttributes($strictModeAttr, ReflectionAttribute::IS_INSTANCEOF))) {
+            return true;
+        }
+        // check parent classes in the deserialization stack
+        foreach (static::$parentStack as $parent) {
+            $refClass = new ReflectionClass($parent);
+            if (!empty($refClass->getAttributes($strictModeAttr, ReflectionAttribute::IS_INSTANCEOF))) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**
